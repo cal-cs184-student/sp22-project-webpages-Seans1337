@@ -1,7 +1,248 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 2 here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+  <style>
+    body {
+      padding: 100px;
+      width: 1000px;
+      margin: auto;
+      text-align: left;
+      font-weight: 300;
+      font-family: 'Open Sans', sans-serif;
+      color: #121212;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: 'Source Sans Pro', sans-serif;
+    }
+  </style>
+  <title>CS 184 Mesh Editor</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+  <h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2022</h1>
+  <h1 align="middle">Project 2: Mesh Editor</h1>
+  <h2 align="middle">Mantej Panesar, Sean Sananikone</h2>
+
+  <br><br>
+
+  <div>
+
+    <h2 align="middle">Overview</h2>
+    <p> 
+      This project focused on ideas of geometric modeling focusing specifically on Bezier curves and surfaces via the de
+      Casteljau algorithm and triangle meshes through the usage of the half-edge data structure and loop subdivision to
+      work with them. This project allowed us to take a look at how geometry is used in computer graphics to display images. 
+      To interact with and see how these concepts are utilized in computer graphics, an interactive GUI exists where we 
+      can toggle different settings and see the impacts that different algorithms make. The first section of the project,
+      Tasks 1 and 2, focus on the usage of de Casteljau algorithm to evaluate Bezier curves and surfaces that allow more
+      complex objects to be displayed. The second section, Tasks 3 to 6, focus on Triangle Meshes and working with the half-edge
+      data structure to traverse these meshes and upscale them. In this project we learned a lot more about how to work with meshes
+      and de Casteljau algorithm to create surfaces.
+    </p>
+
+    <h2 align="middle">Section I: Bezier Curves and Surfaces</h2>
+
+    <p> 
+      Bezier curves and surfaces are important in computer graphics as they allow us to model smooth and infinitely scalable 
+      curves and surfaces. These curves are defined by a set of <i>n + 1</i> points for a degree n curve and a parameter <i>t</i>.
+      Surfaces are defined by <i>(n + 1) * (m + 1)</i> control points and two parameters <i>u</i> and <i>v</i>.
+      de Casteljau algorithm is a way for us to evaluate these curves and surfaces based on any set of control points 
+      and parameters.
+    </p>
+
+    <h3 align="middle">Part 1: Bezier curves with 1D de Casteljau subdivision</h3>
+
+    <p>
+      The algorithm works by essentially inserting new points between two points through linear interpolation, connecting
+      the newly create points, and repeating the process recursively until we end up with a curve. Each recursive call 
+      is one level of subdivision allowing us to get closer and closer to a complete curve shape. This process can be done
+      for any set of <i>n</i> control points defined as <i>p<sub>1</sub>, ..., p<sub>n</sub></i> and a set float of <i>t</i> that we evaluate the curve on.
+      At each recursive step we use a lerp to create <i>n - 1</i> intermediate control points based on t and continue this process
+      until we end up with a singular control point left which lies on the Bezier curve at parameter <i>t</i>. These intermmediate
+      points defined as <i>p`<sub>1</sub>, .., p`<sub>n</sub></i> are caluclated by doing 
+      <i>p`<sub>i</sub> = lerp(p<sub>i</sub> , p<sub>i+1</sub> , t) = (1 - t)p<sub>i</sub> + tp<sub>i</sub>+1</i>.
+    </p>
+
+    <p>
+      Our implementation evaluates a single step of the de Casteljau algorithm. The algorithm works by first checking if the
+      vector of points inputed in is already of size 1 or 0 and if so simply return back the original points since we already
+      gave a singular point. If that is not the case we create a vector called <code>intermediate</code> of type 
+      <cod>Vector2D</cod> where we store the results of calculating the new <i>p`<sub>i</sub></i> points. This 
+      calculation is done via a for loop from positions <code>i = 1</code> to <code>points.size() - 1</code> since the 
+      calculation uses <i>i</i> along with <i>i + 1</i>. Within each step of the for loop we do a lerp via 
+      <code>lerp(t, points[i], points[i + 1])</code> and create the intermediate point which we then push to the 
+      intermediate store. 
+    </p>
+
+    <p align="middle">
+      <img src="img/task1/my-bezier-curve.png" align="middle" width="800px" />
+      <figcaption align="middle">Our Bezeir Curve with 6 control points<br></figcaption>
+    </p>
+
+    <p align="middle">
+        <img src="img/task1/evaluated-curve-only.png" align="middle" width="800px" />
+        <figcaption align="middle">Our Bezeir Curve evaluated<br></figcaption>
+    </p>
+
+    <div align="middle">
+      <table style="width=100%">
+        <tr>
+          <td>
+            <img src="img/task1/step-1.png" align="middle" width="400px" />
+            <figcaption align="middle">Step/Level 1</figcaption>
+          </td>
+          <td>
+            <img src="img/task1/step-2.png" align="middle" width="400px" />
+            <figcaption align="middle">Step/Level 2</figcaption>
+          </td>
+        </tr>
+        <br>
+        <tr>
+          <td>
+            <img src="img/task1/step-3.png" align="middle" width="400px" />
+            <figcaption align="middle">Step/Level 3</figcaption>
+          </td>
+          <td>
+            <img src="img/task1/step-4.png" align="middle" width="400px" />
+            <figcaption align="middle">Step/Level 4</figcaption>
+          </td>
+        </tr>
+        <br>
+        <tr>
+          <td>
+            <img src="img/task1/step-5.png" align="middle" width="400px" />
+            <figcaption align="middle">Step/Level 5</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <p align="middle">
+        <img src="img/task1/modified-control-pts-curve.png" align="middle" width="800px" />
+        <figcaption align="middle">Bezeir Curve After Modifications<br></figcaption>
+    </p>
+
+
+    <h3 align="middle">Part 2: Bezier surfaces with separable 1D de Casteljau subdivision</h3>
+
+    <p>
+      The main algorithm that is used to evaluate Bezier surfaces is very similar to that which is used for Bezier edges. 
+      Now, instead of having a single vector of points that we want to evaluate on, we have a vector of vectors and 
+      2 points that we evaluate. Each of these inner vectors are Bezier curves that we will need to
+      evaluate point <i>u</i> on in order to create control points for the "moving" Bezier curve. We then do a basic
+      1D de Casteljau algorithm, the one used for an edge, to evaluate point <i>v</i> on the "moving" curve that was just created.
+    </p>
+
+    <p>
+      Our implementation splits up this process into 4 functions that allow us to run the entire process. These functions are
+      <code>BezierPatch::evaluate(...)</code>, <code>BezierPatch::evaluate1D(...)</code>, and <code>BezierPatch::evaluateStep(...)</code>.
+      <code>evaluate</code> is how the algorithm gets ran. It takes in an input of <i>u</i> and <i>v</i> and
+      begins the algorithm by calling <code>evaluate1D</code> on each of the vectors of control points stored in <code>controlPoints</code>
+      along with <i>u</i> to evaluate point u on each of the Bezeir curves. <code>evaluate1D</code> achieves this by running
+      <code>evaluateStep</code> until only a singular point is left which is then returned. <code>evaluateStep</code> does the same
+      things as in Part 1 but instead working with <code>Vector3D</code> points. After these points are calculated for each row,
+      <code>evaluate</code> then does one more call to <code>evaluate1D</code> with the parameter <i>v</i> to calculate the final point
+      on the "moving" curve that was caluclated by the row points.
+    </p>
+
+    <p align="middle">
+      <img src="img/task2/teapot-1.png" align="middle" width="800px" />
+      <figcaption align="middle">Teapot evaluated by our implementation<br></figcaption>
+    </p>
+
+    <p align="middle">
+      <img src="img/task2/teapot-2.png" align="middle" width="800px" />
+      <figcaption align="middle">Another angle of the teapot<br></figcaption>
+    </p>
+
+    <h2 align="middle">Section II: Triangle Meshes and Half-Edge Data Structure</h2>
+
+    <p>
+      Utilizing half-edge meshes we are able to create triangle meshes and create 3D objects.T his method is different from
+      that of Section I. While Bezeir curves are better than triangle meshes for representing smooth surfaces and also 
+      require less memory since we simply need to evaluate the points to create our surfaces, they are more difficult
+      to render directly. As such triangle meshes are sometimes preferred even with the tradeoffs. 
+    </p>
+
+    <h3 align="middle">Part 3: Average normals for half-edge meshes</h3>
+
+    <p>
+      Average normals allow us to create different levels of shading within a half-edge mesh by shading in individual vertices.
+      We achieve this within our code by getting an approximate unit normal at each vertex by computing the area-weightred average
+      of the normals of neighboring triangles, then normalizing. To do this we create a <code>Vector3D area_weighted_vertex_normal</code>
+      that is set to a 0, 0, 0 Vector that we can use to keep track of the weighted vertex normal. We then go about traversing
+      each of the neighboring vertices by using a do-while loop on the a half-edge <i>h</i> which is set to the original half-edge.
+      As long as the face of our current half-edge is not a boundary, we retrieve the 3 vertices that define the current face.
+      Using these 3 vertices we compute the 2 vectors that lay along the face by doing <code>Vector3D vector1 = vertex1 - vertex0</code>
+      and <code>Vector3D vector2 = vertex2 - vertex0</code>. Using these two vectors we calculate the normal vector by taking
+      the cross product of the vectors we just created. We then take the norm of the normal vector and divide by two to get the
+      area of the triangle face <code>double tri_face_area</code>. Using this value and the face's normal value we increment
+      <code>area_weighted_vertex_normal += (tri_face_area * face_normal)</code>. After this happens we advance h 
+      <code>h = h->twin()->next()</code> to continue our traversal until we return to the original half-edge. Once we return
+      to the original half-edge we can simply <code>return area_weighted_vertex_normal.unit()</code> giving us the unit normal.
+    </p>
+
+    <div align="middle">
+      <table style="width=100%">
+        <tr>
+          <td>
+              <img src="img/task3/original-shading-1.png" align="middle" width="400px" />
+              <figcaption align="middle">Teapot with original shading<br></figcaption>
+          </td>
+          <td>
+              <img src="img/task3/updated-shading-1.png" align="middle" width="400px" />
+              <figcaption align="middle">Teapot with updated shading<br></figcaption>
+          </td>
+        </tr>
+        <br>
+        <tr>
+          <td>
+              <img src="img/task3/original-shading-2.png" align="middle" width="400px" />
+              <figcaption align="middle">Second angle with original shading<br></figcaption>
+          </td>
+          <td>
+              <img src="img/task3/updated-shading-2.png" align="middle" width="400px" />
+              <figcaption align="middle">Second angle with updated shading<br></figcaption>
+          </td>
+        </tr>
+        <br>
+        <tr>
+          <td>
+              <img src="img/task3/original-shading-3.png" align="middle" width="400px" />
+              <figcaption align="middle">Third angle with original shading<br></figcaption>
+          </td>
+          <td>
+              <img src="img/task3/updated-shading-3.png" align="middle" width="400px" />
+              <figcaption align="middle">Third angle with updated shading<br></figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <h3 align="middle">Part 4: Half-edge flip</h3>
+
+
+    <h3 align="middle">Part 5: Half-edge split</h3>
+
+
+    <h3 align="middle">Part 6: Loop subdivision for mesh upsampling</h3>
+
+
+
+    <h2 align="middle">Section III: Optional Extra Credit</h2>
+    <p>If you are not participating in the optional mesh competition, don't worry about this section!</p>
+
+    <h3 align="middle">Part 7: Design your own mesh!</h3>
+
+</body>
+
 </html>
