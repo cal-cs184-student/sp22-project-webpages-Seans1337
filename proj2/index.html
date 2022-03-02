@@ -69,7 +69,7 @@
       At each recursive step we use a lerp to create <i>n - 1</i> intermediate control points based on t and continue this process
       until we end up with a singular control point left which lies on the Bezier curve at parameter <i>t</i>. These intermmediate
       points defined as <i>p`<sub>1</sub>, .., p`<sub>n</sub></i> are caluclated by doing 
-      <i>p`<sub>i</sub> = lerp(p<sub>i</sub> , p<sub>i+1</sub> , t) = (1 - t)p<sub>i</sub> + tp<sub>i</sub>+1</i>.
+      <i>p`<sub>i</sub> = lerp(p<sub>i</sub> , p<sub>i+1</sub> , t) = (1 - t)p<sub>i</sub> + tp<sub>i + 1</sub></i>.
     </p>
 
     <p>
@@ -83,15 +83,15 @@
       intermediate store. 
     </p>
 
-    <p align="middle">
+    <div align="middle">
       <img src="img/task1/my-bezier-curve.png" align="middle" width="800px" />
       <figcaption align="middle">Our Bezeir Curve with 6 control points<br></figcaption>
-    </p>
+    </div>
 
-    <p align="middle">
+    <div align="middle">
         <img src="img/task1/evaluated-curve-only.png" align="middle" width="800px" />
         <figcaption align="middle">Our Bezeir Curve evaluated<br></figcaption>
-    </p>
+    </div>
 
     <div align="middle">
       <table style="width=100%">
@@ -126,10 +126,29 @@
       </table>
     </div>
 
-    <p align="middle">
+    <div align="middle">
         <img src="img/task1/modified-control-pts-curve.png" align="middle" width="800px" />
-        <figcaption align="middle">Bezeir Curve After Modifications<br></figcaption>
-    </p>
+        <figcaption align="middle">Bezeir curve after modifying control points<br></figcaption>
+    </div>
+
+    <div align="middle">
+      <table style="width=100%">
+        <tr>
+        <td>
+          <img src="img/task1/shifting-t-1.png" align="middle" width="300px"/>
+          <figcaption align="middle">Scrolled t value 1</figcaption>
+        </td>
+        <td>
+          <img src="img/task1/shifting-t-2.png" align="middle" width="300px"/>
+          <figcaption align="middle">Scrolled t value 2</figcaption>
+        </td>
+        <td>
+          <img src="img/task1/shifting-t-3.png" align="middle" width="300px"/>
+          <figcaption align="middle">Scrolled t value 3</figcaption>
+        </td>
+        </tr>
+      </table>
+    </div>
 
 
     <h3 align="middle">Part 2: Bezier surfaces with separable 1D de Casteljau subdivision</h3>
@@ -167,7 +186,7 @@
     <h2 align="middle">Section II: Triangle Meshes and Half-Edge Data Structure</h2>
 
     <p>
-      Utilizing half-edge meshes we are able to create triangle meshes and create 3D objects.T his method is different from
+      Utilizing half-edge meshes we are able to create triangle meshes and create 3D objects.This method is different from
       that of Section I. While Bezeir curves are better than triangle meshes for representing smooth surfaces and also 
       require less memory since we simply need to evaluate the points to create our surfaces, they are more difficult
       to render directly. As such triangle meshes are sometimes preferred even with the tradeoffs. 
@@ -177,8 +196,8 @@
 
     <p>
       Average normals allow us to create different levels of shading within a half-edge mesh by shading in individual vertices.
-      We achieve this within our code by getting an approximate unit normal at each vertex by computing the area-weightred average
-      of the normals of neighboring triangles, then normalizing. To do this we create a <code>Vector3D area_weighted_vertex_normal</code>
+      We achieve this within our code by getting an approximate unit normal at each vertex by computing the area-weighted average
+      of the normals of neighboring faces, then normalizing. To do this we create a <code>Vector3D area_weighted_vertex_normal</code>
       that is set to a 0, 0, 0 Vector that we can use to keep track of the weighted vertex normal. We then go about traversing
       each of the neighboring vertices by using a do-while loop on the a half-edge <i>h</i> which is set to the original half-edge.
       As long as the face of our current half-edge is not a boundary, we retrieve the 3 vertices that define the current face.
@@ -230,9 +249,32 @@
 
     <h3 align="middle">Part 4: Half-edge flip</h3>
 
+    <div align="middle">
+      <img src="img/task4/original_teapot.png" align="middle" width="800px" />
+      <figcaption align="middle">Original teapot<br></figcaption>
+    </div>
+
+    <div align="middle">
+        <img src="img/task4/flipped_teapot.png" align="middle" width="800px" />
+        <figcaption align="middle">Teapot with flipped edges<br></figcaption>
+    </div>
 
     <h3 align="middle">Part 5: Half-edge split</h3>
 
+    <div align="middle">
+      <img src="img/task5/original_teapot.png" align="middle" width="800px" />
+      <figcaption align="middle">Original teapot<br></figcaption>
+    </div>
+
+    <div align="middle">
+        <img src="img/task5/split_teapot.png" align="middle" width="800px" />
+        <figcaption align="middle">Teapot with split edges<br></figcaption>
+    </div>
+
+    <div align="middle">
+      <img src="img/task5/split_flip_teapot.png" align="middle" width="800px" />
+      <figcaption align="middle">Teapot with split and flipped edges<br></figcaption>
+    </div>
 
     <h3 align="middle">Part 6: Loop subdivision for mesh upsampling</h3>
 
