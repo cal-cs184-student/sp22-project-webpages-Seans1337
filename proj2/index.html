@@ -249,6 +249,17 @@
 
     <h3 align="middle">Part 4: Half-edge flip</h3>
 
+    <p>
+      In order to correctly implement the edge flip operation we first had to better understand how the half-edge data structure
+      creates representations of a mesh. An image that helped us to better understand how this happens and what should occur
+      when an edge is flipped was the <a href="https://cmu-graphics.github.io/Scotty3D/meshedit/local/edge_flip_diagram.png">image that was posted on Piazza.</a>
+      We thus based our variable naming scheme off of the image. Within the algorithm we essentially go through and reassign
+      the pointer for every single half-edge, edge, vertex, and face data structure that is involved within edge flip. 
+      The main data structures that had the most modifications were the half-edges of the edge that we wanted to flip. This
+      is due to the fact that for these edges we needed to reassign what their vertices were. Additionally, we wanted to make
+      sure that all of the vertices correctly pointed to a valid half-edge so we made sure to reassign all of vertices' half-edges.
+    </p>
+
     <div align="middle">
       <img src="img/task4/original_teapot.png" align="middle" width="800px" />
       <figcaption align="middle">Original teapot<br></figcaption>
@@ -259,7 +270,27 @@
         <figcaption align="middle">Teapot with flipped edges<br></figcaption>
     </div>
 
+    <p>
+      Originally, we didn't reassign the pointers for the half-edges on the outside of our two faces or the edges themselves, however after 
+      running into issues in Task 6 we went back and reassigned everything to ensure that all of the data structures were correctly
+      set.
+    </p>
+
     <h3 align="middle">Part 5: Half-edge split</h3>
+
+    <p>
+      Similar to edge flips, in order to correctly implement the edge split we first had to better understand how the split would
+      impact the existing elements and create new ones. We based our naming conventions based on a different
+      <a href="https://piazza.com/redirect/s3?bucket=uploads&prefix=paste%2Fjzqdi1r57iy49r%2F5c62459d50ac4badf4b8b97921a7eeec6fd38c9f4d0dc4d8ebbf78e6bf33f3ea%2FIMG_C06DB4844439-1.jpeg">image that was posted on Piazza.</a>
+      Similarly for splits we go through and reassign the pointer for every single half-edge, edge, vertex, and face 
+      data structure. However, for splits we also need to create 1 new vertex, 3 new edges, 3 new faces, and 6 new half-edges. 
+      After creating all of these elements we made sure to assign correctly give these objects their corresponding attributes.
+      By doing so we correctly created the objects and made sure that they displayed correctly. For the new vertex, we made sure
+      to calculate its new position correctly by taking the average of the <i>v<sub>0</sub></i> and <i>v<sub>1</sub></i> positions.
+      For the brand new faces we simply assigned one of the half-edges of the face to be the corresponding half-edge attribute.
+      We did a similar thing for the edges to make sure they rendered correctly. Finally, we made sure to reassign all of the
+      half-edges by using the <code>setNeighbors</code> method and their correspoding neighbors based on the diagram.
+    </p>
 
     <div align="middle">
       <img src="img/task5/original_teapot.png" align="middle" width="800px" />
@@ -275,6 +306,15 @@
       <img src="img/task5/split_flip_teapot.png" align="middle" width="800px" />
       <figcaption align="middle">Teapot with split and flipped edges<br></figcaption>
     </div>
+
+    <p>
+      One debugging issue that we ran into while doing this part was having the mesh not correctly rendering. We saw that after
+      doing a flip the program would not load the image. This was due to having some of the vertices not correctly updating their
+      half-edges leading to an impossible mesh layout. Another similar issue that occured was assigning a half-edge to the wrong
+      face which also lead to issues with the mesh not coming out as intended.
+      Just like with the flip we didn't originally reassign the pointers for the half-edges on the outside of our two faces or the edges themselves, 
+      however after running into issues with Task 6 we went back and added the rest of the objects.
+    </p>
 
     <h3 align="middle">Part 6: Loop subdivision for mesh upsampling</h3>
 
