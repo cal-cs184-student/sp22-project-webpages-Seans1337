@@ -85,13 +85,15 @@
 
     <div align="middle">
       <img src="img/task1/my-bezier-curve.png" align="middle" width="800px" />
-      <figcaption align="middle">Our Bezeir Curve with 6 control points<br></figcaption>
+      <figcaption align="middle">Our Bezeir Curve with 6 control points</figcaption>
     </div>
+    <br>
 
     <div align="middle">
         <img src="img/task1/evaluated-curve-only.png" align="middle" width="800px" />
-        <figcaption align="middle">Our Bezeir Curve evaluated<br></figcaption>
+        <figcaption align="middle">Our Bezeir Curve evaluated</figcaption>
     </div>
+    <br>
 
     <div align="middle">
       <table style="width=100%">
@@ -128,7 +130,7 @@
 
     <div align="middle">
         <img src="img/task1/modified-control-pts-curve.png" align="middle" width="800px" />
-        <figcaption align="middle">Bezeir curve after modifying control points<br></figcaption>
+        <figcaption align="middle">Bezeir curve after modifying control points</figcaption>
     </div>
 
     <div align="middle">
@@ -173,15 +175,17 @@
       on the "moving" curve that was caluclated by the row points.
     </p>
 
-    <p align="middle">
+    <div align="middle">
       <img src="img/task2/teapot-1.png" align="middle" width="800px" />
-      <figcaption align="middle">Teapot evaluated by our implementation<br></figcaption>
-    </p>
+      <figcaption align="middle">Teapot evaluated by our implementation</figcaption>
+    </div>
+    <br>
 
-    <p align="middle">
+    <div align="middle">
       <img src="img/task2/teapot-2.png" align="middle" width="800px" />
-      <figcaption align="middle">Another angle of the teapot<br></figcaption>
-    </p>
+      <figcaption align="middle">Another angle of the teapot</figcaption>
+    </div>
+    <br>
 
     <h2 align="middle">Section II: Triangle Meshes and Half-Edge Data Structure</h2>
 
@@ -215,33 +219,33 @@
         <tr>
           <td>
               <img src="img/task3/original-shading-1.png" align="middle" width="400px" />
-              <figcaption align="middle">Teapot with original shading<br></figcaption>
+              <figcaption align="middle">Teapot with original shading</figcaption>
           </td>
           <td>
               <img src="img/task3/updated-shading-1.png" align="middle" width="400px" />
-              <figcaption align="middle">Teapot with updated shading<br></figcaption>
+              <figcaption align="middle">Teapot with updated shading</figcaption>
           </td>
         </tr>
         <br>
         <tr>
           <td>
               <img src="img/task3/original-shading-2.png" align="middle" width="400px" />
-              <figcaption align="middle">Second angle with original shading<br></figcaption>
+              <figcaption align="middle">Second angle with original shading</figcaption>
           </td>
           <td>
               <img src="img/task3/updated-shading-2.png" align="middle" width="400px" />
-              <figcaption align="middle">Second angle with updated shading<br></figcaption>
+              <figcaption align="middle">Second angle with updated shading</figcaption>
           </td>
         </tr>
         <br>
         <tr>
           <td>
               <img src="img/task3/original-shading-3.png" align="middle" width="400px" />
-              <figcaption align="middle">Third angle with original shading<br></figcaption>
+              <figcaption align="middle">Third angle with original shading</figcaption>
           </td>
           <td>
               <img src="img/task3/updated-shading-3.png" align="middle" width="400px" />
-              <figcaption align="middle">Third angle with updated shading<br></figcaption>
+              <figcaption align="middle">Third angle with updated shading</figcaption>
           </td>
         </tr>
       </table>
@@ -262,13 +266,15 @@
 
     <div align="middle">
       <img src="img/task4/original_teapot.png" align="middle" width="800px" />
-      <figcaption align="middle">Original teapot<br></figcaption>
+      <figcaption align="middle">Original teapot</figcaption>
     </div>
+    <br>
 
     <div align="middle">
         <img src="img/task4/flipped_teapot.png" align="middle" width="800px" />
-        <figcaption align="middle">Teapot with flipped edges<br></figcaption>
+        <figcaption align="middle">Teapot with flipped edges</figcaption>
     </div>
+    <br>
 
     <p>
       Originally, we didn't reassign the pointers for the half-edges on the outside of our two faces or the edges themselves, however after 
@@ -294,17 +300,19 @@
 
     <div align="middle">
       <img src="img/task5/original_teapot.png" align="middle" width="800px" />
-      <figcaption align="middle">Original teapot<br></figcaption>
+      <figcaption align="middle">Original teapot</figcaption>
     </div>
+    <br>
 
     <div align="middle">
         <img src="img/task5/split_teapot.png" align="middle" width="800px" />
-        <figcaption align="middle">Teapot with split edges<br></figcaption>
+        <figcaption align="middle">Teapot with split edges</figcaption>
     </div>
+    <br>
 
     <div align="middle">
       <img src="img/task5/split_flip_teapot.png" align="middle" width="800px" />
-      <figcaption align="middle">Teapot with split and flipped edges<br></figcaption>
+      <figcaption align="middle">Teapot with split and flipped edges</figcaption>
     </div>
 
     <p>
@@ -318,12 +326,164 @@
 
     <h3 align="middle">Part 6: Loop subdivision for mesh upsampling</h3>
 
+    <p>
+      To implement loop subdivision we based it on the steps that were in the skeleton of the code. This is achieved by using 
+      four different loops that go over all of the edges within the mesh. The first for loop is used to calculate the new positions
+      for all of the prexisting vertices within the mesh and to calculate the position of the new vertices that should be created by
+      the splits. To calculate the new position for the old vertices we use the formula 
+      <code>(1 - n * u) * original_position + u * original_neighbor_position_sum</code> from the lecture. In order to calculate the
+      <code>original_neighbor_position_sum</code> we do an inner loop that goes over the neighbors of the current edge and retrieves
+      the position of the neighboring vertices. After collecting the sum of the neighbor positions we then divide by the vertex degree.
+      Using these values we can calculate the updated position and store it within the <code>newPosition</code> attribute of the
+      vertex. After this occurs we grab four vertices <i>A, B, C, D</i> based on the diagram from the spec. Using these four vertices
+      we calculate <code>3/8 * (A + B) + 1/8 * (C + D)</code> and store this new position into the edge. This value represents the
+      position that the vertex of an edge split of the current edge should take. During this time we make sure to mark the vertices 
+      and edges we work with as not being <code>isNew</code> to ensure that our splits and flips work correctly. 
+    </p>
+    <p>
+      The next loop is used to split all of the edges in the mesh. To do this we use a while loop that starts at the first edge and goes
+      to the last edge. Within each iteration, before we do any splitting we make sure to check that both vertices of the edge are new.
+      If either of them is not new that means that the edge we are currently looking at is one that was created when a edge was split.
+      Additionally, to make sure that all of the vertices and edges have the correct <code>isNew</code> value, we updated our 
+      split code to set the <code>isNew</code> attributes accordingly for the vertex and four edges that are invovled with a split.
+      Since an edge being split is done by essentially inserting a new edge at the vertex point, we treat the created edge that was originally
+      part of the main edge as not being a new edge. Additionally, during this time we make sure to set the <code>newPosition</code>
+      for the vertex that was just created to be the <code>newPosition</code> that is being stored by the edge.
+    </p>
+    <p>
+      After splitting all the edges we want to now flip new edges that inolve one new vertex and one vertex. To achieve this,
+      we do another while loop, done in the same way as the second loop. Within this loop we have an if check that only flips
+      when the necessary conditions are met.
+    </p>
+    <p>
+      Our final loop is simply done to go through and correctly update the vertex positions. This is done with another for loop
+      where we simply set <code>vertex->position = vertex->newPosition</code> for the half-edge that the edge represents.
+    </p>
+    <p>
+      There were a couple of debugging issues that we ran into when doing this task. As mentioned above, during Task 6 we went
+      back and added additional assignments to our Task 4 and 5 implementations since they were not as robust as needed. Another
+      debugging issue that we had was that the calculations for the new vertex positions were coming out incorrectly due to us 
+      forgetting to cast to floats leading our numbers to become rounded. An additional issue we had was forgetting to reassign
+      the newly created vertex's position to be the new vertex position that was being stored within the edge. Since we failed
+      to do this our vertices were not showing up in the right places and were causing issues with our final mesh.
+    </p>
+    <p>
+      Looking at the results of running the subdivision loops what we noticed was that each level of subdivion seemed to make
+      the mesh more and more smooth. The biggest change on the torus seems to hapen between the 0th and 1st subdivision loops.
+      As a result of the smoothening out of the mesh sharp corners and edges fade as we run more loops. However,
+      by splitting on an edge we can slow down the amount by which the sharp edges dissapear.
+    </p>
+    
+    <div align="middle">
+      <img src="img/task6/torus_0.png" align="middle" width="800px" />
+      <figcaption align="middle">Original torus</figcaption>
+    </div>
+    <br>
+
+    <div align="middle">
+      <table style="width=100%">
+        <tr>
+        <td>
+          <img src="img/task6/torus_1.png" align="middle" width="400px" />
+          <figcaption align="middle">Torus after 1 subdivision loop</figcaption>
+        </td>
+        <td>
+          <img src="img/task6/torus_split_1.png" align="middle" width="400px"/>
+          <figcaption align="middle">Torus after 1 subdivision loop with a split edge <br> leaving a more sharp edge</figcaption>
+        </td>
+      </table>
+    </div>
+    <br>
+
+    <div align="middle">
+      <img src="img/task6/torus_2.png" align="middle" width="800px" />
+      <figcaption align="middle">Torus after 2 subdivision loops</figcaption>
+    </div>
+    <br>
+    
+    <div align="middle">
+      <img src="img/task6/torus_3.png" align="middle" width="800px" />
+      <figcaption align="middle">Torus after 3 subdivision loops</figcaption>
+    </div>
+    <br>
+
+    <div align="middle">
+      <img src="img/task6/torus_4.png" align="middle" width="800px" />
+      <figcaption align="middle">Torus after 4 subdivision loops</figcaption>
+    </div>
+    <br>
+
+    <div align="middle">
+      <img src="img/task6/torus_5.png" align="middle" width="800px" />
+      <figcaption align="middle">Torus after 5 subdivision loops</figcaption>
+    </div>
+    <br>
+
+    <p>
+      Pre-splitting some of the edges changes the effects of our subdivisions. By splitting all of the middle edges of our cube we
+      can siginficantly decrease the asymmetry of the object after repeated subdivisions. By doing the split we make each face
+      of the cube into a symmetric object. As such when we do the subdivision we are doing the same work equally on all sides of
+      each face on all faces keeping the symmetry of the object.
+    </p>
+
+    <div align="middle">
+      <table style="width=100%">
+        <tr>
+          <td>
+              <img src="img/task6/cube_0.png" align="middle" width="400px" />
+              <figcaption align="middle">Original cube</figcaption>
+          </td>
+          <td>
+              <img src="img/task6/cube_split_0.png" align="middle" width="400px" />
+              <figcaption align="middle">Split cube</figcaption>
+          </td>
+        </tr>
+        <br>
+        <tr>
+          <td>
+              <img src="img/task6/cube_1.png" align="middle" width="400px" />
+              <figcaption align="middle">Cube after 1 subdivision loop</figcaption>
+          </td>
+          <td>
+              <img src="img/task6/cube_split_1.png" align="middle" width="400px" />
+              <figcaption align="middle">Split cube after 1 subdivision loop</figcaption>
+          </td>
+        </tr>
+        <br>
+        <tr>
+          <td>
+              <img src="img/task6/cube_2.png" align="middle" width="400px" />
+              <figcaption align="middle">Cube after 2 subdivision loops</figcaption>
+          </td>
+          <td>
+              <img src="img/task6/cube_split_2.png" align="middle" width="400px" />
+              <figcaption align="middle">Split cube after 2 subdivision loops</figcaption>
+          </td>
+        </tr>
+        <br>
+        <tr>
+          <td>
+              <img src="img/task6/cube_3.png" align="middle" width="400px" />
+              <figcaption align="middle">Cube after 3 subdivision loops</figcaption>
+          </td>
+          <td>
+              <img src="img/task6/cube_split_2.png" align="middle" width="400px" />
+              <figcaption align="middle">Split cube after 3 subdivision loops</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
 
 
-    <h2 align="middle">Section III: Optional Extra Credit</h2>
-    <p>If you are not participating in the optional mesh competition, don't worry about this section!</p>
-
-    <h3 align="middle">Part 7: Design your own mesh!</h3>
+    <br>
+    <br>
+    <h3 align="middle">Project Webpage Link</h3>
+    <p>
+      <a href="https://cal-cs184-student.github.io/sp22-project-webpages-Seans1337/proj2/index.html">Project 2 Webpage</a>
+      <br>
+      <br>
+      https://cal-cs184-student.github.io/sp22-project-webpages-Seans1337/proj2/index.html
+    </p>
 
 </body>
 
