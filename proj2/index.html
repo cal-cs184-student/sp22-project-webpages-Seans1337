@@ -333,8 +333,10 @@
       the splits. To calculate the new position for the old vertices we use the formula 
       <code>(1 - n * u) * original_position + u * original_neighbor_position_sum</code> from the lecture. In order to calculate the
       <code>original_neighbor_position_sum</code> we do an inner loop that goes over the neighbors of the current edge and retrieves
-      the position of the neighboring vertices. After collecting the sum of the neighbor positions we then divide by the vertex degree.
-      Using these values we can calculate the updated position and store it within the <code>newPosition</code> attribute of the
+      the position of the neighboring vertices. To get <i>u</i> we check how many neighbors the vertex has and set <i>u</i> by doing
+      <coode>u = (num_neighbors == 3) ? ((float)(3.0 / 16)) : ((float)(3.0 / (8.0 * num_neighbors)))</coode>. 
+      After collecting the sum of the neighbor positions and setting u we then calculate the weighted average.
+      This weighted average is then stored within the <code>newPosition</code> attribute of the
       vertex. After this occurs we grab four vertices <i>A, B, C, D</i> based on the diagram from the spec. Using these four vertices
       we calculate <code>3/8 * (A + B) + 1/8 * (C + D)</code> and store this new position into the edge. This value represents the
       position that the vertex of an edge split of the current edge should take. During this time we make sure to mark the vertices 
@@ -351,9 +353,9 @@
       for the vertex that was just created to be the <code>newPosition</code> that is being stored by the edge.
     </p>
     <p>
-      After splitting all the edges we want to now flip new edges that inolve one new vertex and one vertex. To achieve this,
+      After splitting all the edges we want to now flip new edges that inolve one new vertex and one old vertex. To achieve this,
       we do another while loop, done in the same way as the second loop. Within this loop we have an if check that only flips
-      when the necessary conditions are met.
+      when the above condition is met.
     </p>
     <p>
       Our final loop is simply done to go through and correctly update the vertex positions. This is done with another for loop
