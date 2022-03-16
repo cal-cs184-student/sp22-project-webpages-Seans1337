@@ -39,7 +39,7 @@
     <p> 
 	  This project focused on ideas of path tracing breaking it down into five smaller parts. 
 	  Part 1, Ray Generation and Scene Intersection, focuses on creating a camera ray and testing for intersection of rays and objects.
-	  Part 2, Bounding Volume Hierarchy, focuses on the creation of BVHs for us to figure out intersections of rays and objects
+	  Part 2, Bounding Volume Hierarchy, focuses on the creation of BVHs for us to figure out intersections of rays and objects.
 	  Part 3, Direct Illumination, focuses on direct illumination as a way for us to render our scenes.
 	  Part 4, Global Illumination, focuses on global illumination as a way for us to render our scenes.
 	  Part 5, Adaptive Sampling, uses adapative sampling to create an image that eliminates the noise of using Monte Carlo sampling.
@@ -201,7 +201,9 @@
 
 	<h2 align="middle">Part 3: Direct Illumination</h2>
 	<p>
+		In the previous part, BVH and intersections were implemented, which can now be leveraged to illuminate the scenes and geometries being rendered.
 		Part 3 aims to implement two versions of the direct lighting function, uniform hemisphere sampling and importance light sampling.
+		Implementing direct illumination will focus on only considering a 1-bounce path connecting a ray to a light source.
 	</p>
 
 	<p>
