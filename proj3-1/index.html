@@ -112,7 +112,7 @@
 				</td>
 				<td>
 					<img src="img/part1/CBgems.png" width="333px" />
-					<figcaption align="middle">Many Spheres Render</figcaption>
+					<figcaption align="middle">Gems Render</figcaption>
 				</td>
 			</tr>
 		</table>
@@ -244,7 +244,6 @@
 			</tr>
 		</table>
 	</div>
-	<br>
 
 	<p>
 		We can analyze the affect of the number of light rays on the noise levels in soft shadows by looking at
@@ -279,7 +278,49 @@
 	</div>
 
 	<h2 align="middle">Part 4: Global Illumination</h2>
+	<p>
+		In the previous part, direct illumination was implemented, but there is more sophistication that can be added to the rendered geometrics and scenes by utilizing full global illumination.
+		In particular, there will be more visual richness in the rendering given the indirect lighting addition.
+		At a high level, I implemented indirect illumination by leveraging recursion in order to trace subsequent locations in the scene and computing how much light arrived at the given location.
+		It is important to clarify that now to implement indirect lighting, I considered all objects, whereas in direct illumination only light sources were considered.
+		Moreover, the contribution of higher bounces will decrease exponentially, therefore, I leveraged Russian Roulette in order to stop infinite recursion by using an unbiased way to terminate the bouncing.
+	</p>
+	
+	<p>
+		Specifically, given the input ray <code>r</code> and the intersection <code>isect</code>, I determined the <code>emitted_radiance</code> and populated <code>pdf</code> and <code>dir_sample</code> by invoking <code>isect.bsdf->sample_f(w_out, &dir_sample, &pdf);</code>.
+		I then utilized <code>dir_sample</code>, which was populated by the function call to <code>sample_f(...)</code>, to obtain the direction of the new ray in world coordinates.
+		Now, I was able to create a new ray <code>r2</code> which would be used to trace the next intersection (this is used to trace an inverse path). For this new ray <code>r2</code>, I set the <code>r2.min_t = EPS_F</code> to offset the range of valid intersections and I set the depth of the new ray <code>r2->depth = r->depth - 1;</code> to account for traversing depth of rays (note: I also updated <code>raytrace_pixel(...)</code> to intialize a camera's ray depth to be <code>max_ray_depth</code>).
+		As mentioned above, in order to trace the inverse path, I created a new intersection object <code>isect2</code>, which is used in conjunction with the new ray to check for an intersection by invoking <code>bvh->intersect(r2, &isect2)</code>.		
+	</p>
+	
+	<p>
+		At this point, in order to determine how and whether to recurse, I first checked if the depth of the new ray is greater than 0 (this means there are more bounces to consider) and that there was an intersection (as mentioned above).
+		If the condition (<code>r2.depth > 0 && bvh->intersect(r2, &isect2)</code>) is true, then I recurse on the new ray. If there is no intersection, then no recursion will happen since light does not bounce off anything. If the max ray depth has been reached, then no recursion will happen.
+	</p>
+	
+	<p>
+		Now, I will explain the more granular cases for when recursion should happen. If <code>max_ray_depth > 1</code> (indirect illumination is turned on) and the new ray's depth <code>r2->depth</code> is equal to <code>max_ray_depth - 1</code>, then this is the scenario where at least one indirect bounce is traced (regardless of Russian Roulette).
+		In this case, I recurse to find the radiance by invoking <code>at_least_one_bounce_radiance(r2, isect2)</code> and update <code>L_out</code> by following the reflectance equation: <code>L_out += (emitted_radiance * l * cosval) / pdf</code>.
+		If <code>(r2.depth == max_ray_depth - 1 && max_ray_depth > 1)</code> is false (i.e. not the case described above), then I will continue to recurse as dictated by Russian Roulette.
+		I created a variable to store a boolean flag <code>continue_bouncing</code> to determine whether to continue the recursion.
+		The flag is initialized as follows <code>coin_flip(1 - termination_prob)</code>, where <code>termination_prob</code> is set to 0.3.
+		If <code>countinue_bouncing</code> is true, I recurse to find the radiance by invoking <code>at_least_one_bounce_radiance(r2, isect2)</code> and update <code>L_out</code> by following the reflectance equation: <code>L_out += (emitted_radiance * l * cosval) / pdf / (1.0 - termination_prob);</code>.
+		It is worth noting that I only divide by the continuation probability when the Russian Roulette case is considered; by accounting for this difference ensures that Russian Roulette remains unbiased.
+	</p>
 
+	<p>
+		After implementing <code>at_least_one_bounce(...)</code>, I updated <code>est_radiance_global_illumination(...)</code> to use <code>at_least_one_bounce(...)</code> when getting the estimate of total radance with global illumination.
+	</p>
+	
+	<p>
+		During the implementation of this part, I experienced issues where my rendered scenes and geometries were overexposed. After debugging, I realized that I had to handle the cases of recursion more carefully.
+		In particular, I ensured that I always recursed at least once for indirect illumination. I ensured that I only divided by the continuation probability in the Russian Roulette case as opposed to always.
+	</p>
+	
+	<p>
+		todo: add images
+	</p>
+	
 	<h2 align="middle">Part 5: Adaptive Sampling</h2>
 	<p>
 	   In the previous part, Monte Carlo path tracing was implemented in order to generate the realistic images.
@@ -327,7 +368,6 @@
 	   todo: add images
 	</p>
 	
-
 	<br>
 	<br>
 	<h3 align="middle">Project Webpage Link</h3>
