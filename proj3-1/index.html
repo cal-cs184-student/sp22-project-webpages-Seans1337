@@ -65,9 +65,20 @@
 		Task 2 asks us to simply generate <code>num_samples</code> camera rays and trace them throughout the scene.
 		After implementing Task 2 we were able to generate images such as the following.
 	</p>
+
 	<div align="middle">
-		<img src="img/part1/banana.png" width="800px" />
-		<figcaption align="middle">Banana After Task 2</figcaption>
+		<table style="width=100%">
+			<tr>
+				<td>
+					<img src="img/part1/task2/banana.png" width="500px" />
+					<figcaption align="middle">Banana after Task 2</figcaption>
+				</td>
+				<td>
+					<img src="img/part1/task2/CBempty.png" width="500px" />
+					<figcaption align="middle">CBempty after Task 2</figcaption>
+				</td>
+			</tr>
+		</table>
 	</div>
 	<br>
 
@@ -117,6 +128,7 @@
 			</tr>
 		</table>
 	</div>
+	<br>
 
 	<h2 align="middle">Part 2: Bounding Volume Hierarchy</h2>
 	<p>
@@ -156,6 +168,37 @@
 	</p>
 	
 	<p>
+		Looking at the cow mesh and stepping through the nodes of our BVH we can get an idea of our algorithm.
+	</p>
+
+	<div align="middle">
+		<table style="width=100%">
+			<tr>
+				<td>
+					<img src="img/part2/bvh/cow_bvh0.png" width="500px" />
+					<figcaption align="middle">No splits</figcaption>
+				</td>
+				<td>
+					<img src="img/part2/bvh/cow_bvh1.png" width="500px" />
+					<figcaption align="middle">1st split</figcaption>
+				</td>
+			</tr>
+			<br>
+			<tr>
+				<td>
+					<img src="img/part2/bvh/cow_bvh2.png" width="500px" />
+					<figcaption align="middle">2nd split</figcaption>
+				</td>
+				<td>
+					<img src="img/part2/bvh/cow_bvh3.png" width="500px" />
+					<figcaption align="middle">3rd split</figcaption>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br>
+
+	<p>
 		The following are images with normal shading for a few large <i>.dae</i> files that could only render with acceleration
 		due to the high number of triangles contained within the image.
 	</p>
@@ -185,6 +228,7 @@
 			</tr>
 		</table>
 	</div>
+	<br>
 
 	<p>
 		In order to understand how BVH acceleration helped to speed up our renderings we tested on 3 different meshes, 
@@ -197,13 +241,18 @@
 		BVH is much smaller than the time saved by using BVH Acceleration for the rendering.
 		Specifically, the use of a BVH reduces the ray intersection complexity from <code>O(n)</code> to <code>O(log(n))</code>.
 	 </p>
-	 
 
 	<h2 align="middle">Part 3: Direct Illumination</h2>
 	<p>
 		In the previous part, BVH and intersections were implemented, which can now be leveraged to illuminate the scenes and geometries being rendered.
 		Part 3 aims to implement two versions of the direct lighting function, uniform hemisphere sampling and importance light sampling.
 		Implementing direct illumination will focus on only considering a 1-bounce path connecting a ray to a light source.
+	</p>
+
+	<p>
+		The first thing that we implemented was Diffuse BSDF which represents the ratio of incoming light scattered from incident direction to outgoing direction.
+		To achieve this we simply return the reflectance of our object divided by pi. This method we created is used in both the
+		<code>estimate_direct_lighting_importance</code> and <code>estimate_direct_lighting_hemisphere</code> as a part of our radiance calculations.
 	</p>
 
 	<p>
@@ -246,6 +295,7 @@
 			</tr>
 		</table>
 	</div>
+	<br>
 
 	<p>
 		We can analyze the affect of the number of light rays on the noise levels in soft shadows by looking at
@@ -278,6 +328,7 @@
 			</tr>
 		</table>
 	</div>
+	<br>
 
 	<h2 align="middle">Part 4: Global Illumination</h2>
 	<p>
