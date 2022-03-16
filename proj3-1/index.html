@@ -1,6 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
+<script src=
+"http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
 <head>
   <style>
     body {
@@ -34,8 +38,7 @@
 	<br><br>
 
 	<div>
-	
-		<h2 align="middle">Overview</h2>
+	<h2 align="middle">Overview</h2>
     <p> 
 	  This project focused on ideas of path tracing breaking it down into five smaller parts. 
 	  Part 1, Ray Generation and Scene Intersection, focuses on creating a camera ray and testing for intersection of rays and objects.
@@ -47,45 +50,198 @@
 	</p>
 	
     <h2 align="middle">Part 1: Ray Generation and Intersection</h2>
-	<p>To create the ray we ...</p>
+	<p>
+		Part 1 aims to create Rays and calculate Ray Intersections. In Task 1 we go about implementing the <code>generate_ray</code>
+		method which aims to take a normalized image coordinate <i>(x, y)</i> and outputs a ray in the world space. We achieve this by
+		transforming the image coordinates to camera space, generating the ray in camera space, and then transforming it into a ray in
+		world space. In order to do the translation to camera space we first calculate the translated position by taking the 
+		original position and subtracting it by the translated origin point of <code>Vector2D(0.5, 0.5)</code>. Using this we calclate the 
+		camera space coordinates by creating the Vector3D in camera space: 
+		<code>Vector3D(translated_pos[0] * 2 * tan(hFov_rads * 0.5), translated_pos[1] * 2 * tan(vFov_rads * 0.5), -1)</code> where
+		<code>hFov_rads</code> and <code>vFov_rads</code> are the hFov and vFov but in radians since the trig functions use radians.
+		We then transform the direction of the ray back into world space by first multiplying the calculated ray by <code>c2w</code> , 
+		the camera-to-world rotation matrix, and then normalizing. Finally we create a ray for the world space based on this transformed 
+		direction vector and the <code>pos</code>, the camera position in the world space. 
+	</p>
 
-	<p>After implementing Task 2 we can generate images.</p>
+	<p>
+		Task 2 asks us to simply generate <code>num_samples</code> camera rays and trace them throughout the scene.
+		After implementing Task 2 we were able to generate images such as the following.
+	</p>
 	<div align="middle">
 		<img src="img/part1/banana.png" align="middle" width="800px" />
 		<figcaption align="middle">Banana After Task 2</figcaption>
 	</div>
 	<br>
 
+	<p>
+		Tasks 3 and 4 aim to calculate ray-primitive intersections. For the triangle intersection algorithm we check whether or 
+		not a ray is intersecting a triangle object. To do this we implemented the Moller Trumbore Algorithm 
+		(done by a helper function <code>moller_trumbore_algo(const Ray &r)</code>), referenced in Lecture 9 Slide 22
+		and Discussion 5. Within this algorithm we create 5 <code>Vector3D</code> objects. These objects represent the 2 edges of the triangle 
+		involving <code>p1</code> (<code>e1, e2</code>), the vector from the ray origin to <code>p1</code> (<code>s</code>), the cross product of
+		the direction of the ray and <code>e2</code> (<code>s1</code>), and the cross product of <code>s</code> and <code>e1</code>
+		<code>(s2)</code>. Using these 5 vectors we then calcualte the resulting vector which is returned as follows:
+		<code>(1.0 / dot(s1, e1)) * Vector3D(dot(s2, e2), dot(s1, s), dot(s2, r.d))</code>. The resulting vector gives us a point of intersection at the 0th index
+		and the Barycentric coordinates of beta and gamma at the other indices. Using this resulting vector we can calculate the Barycentric
+		coordinate for alpha by doing <code>1 - beta - gamma</code> and checking if the Barycentric coordinate is valid by ensuring that
+		all values are greater than or equal to zero and less than or equal to 1. Once we have verified the Barycentric coordinate we must then
+		check whether the intersection point is valid by making sure it is greater than or equal to 0 and the <code>r.min_t</code> as well
+		as it is less tahn or equal to the <code>r.max_t</code>. If any of these cases fail there is not an intersection. If a valid intersection has occured
+		we want to update the <code>Intersection *isect</code> object with the information of the intersection as well as updating 
+		<code>r.max_t</code> to be the t at the intersection.
+	</p>
+
+	<p>
+		The sphere intersection algorithm is similar in that we first check to make sure that the ray and the Sphere object intersect. 
+		Instead of using the Moller Trumbore Algorithm we can figure out if there is an intersection by solving a quadratic equation 
+		using the dot product of the direction of r, the dot product of 2 times the distance between the ray origin and sphere origin
+		and the direction of r, and the dot product of the difference between the two origins subtracted by the radius squared. If the
+		resulting t is valid, then we have a valid intersection. After this, it is similar to the Triangle algorithm where we 
+		want to update the <code>Intersection</code> object and the <code>r.max_t</code>.
+	</p>
+
 	<p>After implementing Tasks 3 and 4 we can now render scenes with objects in them.</p>
 	<div align="center">
 		<table style="width=100%">
 			<tr>
 				<td>
-					<img src="img/part1/CBempty.png" align="middle" width="300px" />
+					<img src="img/part1/CBempty.png" align="middle" width="333px" />
 					<figcaption align="middle">Empty Render</figcaption>
 				</td>
 				<td>
-					<img src="img/part1/CBspheres_lambertian.png" align="middle" width="300px" />
+					<img src="img/part1/CBspheres_lambertian.png" align="middle" width="333px" />
 					<figcaption align="middle">Sphere Render</figcaption>
 				</td>
 				<td>
-					<img src="img/part1/CBgems.png" align="middle" width="300px" />
+					<img src="img/part1/CBgems.png" align="middle" width="333px" />
 					<figcaption align="middle">Many Spheres Render</figcaption>
 				</td>
 			</tr>
 		</table>
 	</div>
 
-	<p>This time it's your job to copy-paste in the rest of the sections :)</p>
-
 	<h2 align="middle">Part 2: Bounding Volume Hierarchy</h2>
+	<p>
+		With more complex geometries and scenes, there will inherently be more primitives, which means tracing rays and detecting intersections will be computationally expensive.
+		In order to make ray tracing more efficient, a bounding volume hierarchy can be implemented to enable traversing the complex geometries and scenes faster.
+	</p>
+
+	<p>
+		In order to construct the BVH, I first determined the bounding box for the overall scene.
+		I did this by utilizing the primitive iterators <code>start</code> and <code>end</code>.
+		I created a variable <code>bbox</code> to represent the overall scene's bounding box, and then while iterating over each primitive, I would expand <code>bbox</code> with the bounding box of the current primitive.
+	</p>
+	
+	<p>
+		Second, I would check whether the node being created should be a leaf or an interior node. I created a new node <code>node</code> which would have its fields populated according to whether it is a leaf node or an interior node.
+		Specifically, if the number of primitives provided by the given iterators (<code>start</code> and <code>end</code>) was less than or equal to <code>max_leaf_size</code>, then I would create a new leaf node.
+		When creating a new leaf node, I set <code>node->start</code> to the provided iterator <code>start</code>, <code>node->end</code> to the provided iterator <code>end</code>, <code>node->l</code> and <code>node->l</code> to <code>NULL</code>.
+	</p>
+	
+	<p>
+		In the event that the the number of primitives was more than <code>max_leaf_size</code>, I would create an interior node.
+		When creating a new interior node, I set <code>node->start</code> and <code>node->end</code> to <code>NULL</code>, since an interior node does not contain reference to primitives.
+		However, I set <code>node->l</code> and <code>node->r</code> by invoking a recursive call to resolve each respective child node.
+		I calculate the mean centroid of all the provided primitives and calculate the longest axis to divide on in order to divide the given primitives between the left and right child of the interior node.
+		In particular, I calculated the longest axis to divide on by choosing the axis/dimension where <code>bbox.extent</code> was the largest.
+		I leveraged <code>std::max_element(...)</code> to return the index of the largest element in <code>bbox.extent</code>, where 0 corresponded to the x-axis, 1 corresponded to the y-axis, and 2 corresponded to the z-axis.
+	</p>
+	
+	<p>
+		Now, I needed to organize the underlying data given by the provided iterators such that I could pass them into the recursive calls to resolve the left and right children of this interior node.
+		I leveraged <code>std::partition(...)</code> and a helper lambda I created which would organize the primitives based on a pivot value.
+		The pivot value was determined by indexing into <code>bbox.extent</code> using the index corresponding to the axis being split on.
+		Now, I created a new iterator variable <code>mid</code> which would be used to define the ending iterator for the left child's recursive call and the starting iterator for the right child's recursive call.
+		Before invoking the recursive calls, I also ensured that the left and right groupings had at least 1 primitive (this is done to ensure that infinite recursion and an eventual segfault are avoided).
+		If there was a scenario where either group did not have a primitve, I would either increment or decrement <code>mid</code> in order to allocate one primitve to the other group.
+		Finally, I set <code>node->l = construct_bvh(start, mid, max_leaf_size);</code> and <code>node->r = construct_bvh(mid, end, max_leaf_size);</code>.
+	</p>
+	
+	<p>
+		The following are images with normal shading for a few large <i>.dae</i> files that could only render with acceleration
+		due to the high number of triangles contained within the image.
+	</p>
+	
+	<div align="middle">
+		<table style="width=100%">
+			<tr>
+				<td>
+					<img src="img/part2/CBdragon.png" align="middle" width="500px" />
+					<figcaption align="middle"><i>dae/sky/CBdragon.dae</i></figcaption>
+				</td>
+				<td>
+					<img src="img/part2/CBlucy.png" align="middle" width="500px" />
+					<figcaption align="middle"><i>dae/sky/CBlucy.dae</i></figcaption>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<img src="img/part2/beast.png" align="middle" width="500px" />
+					<figcaption align="middle"><i>dae/meshedit/beast.dae</i></figcaption>
+				</td>
+				<td>
+					<img src="img/part2/maxplanck.png" align="middle" width="500px" />
+					<figcaption align="middle"><i>dae/meshedit/maxplanck.dae</i></figcaption>
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	<p>
+		In order to understand how BVH acceleration helped to speed up our renderings we tested on 3 different meshes, 
+		<i>dae/meshedit/beetle.dae, dae/meshedit/cow.dae, dae/meshedit/teapot.dae</i>. For all 3 of these scenes it was possible to render without
+		BVH acceleration but we saw a huge speed up once we implemented BVH. For the beetle scene we went from a rendering time of 33.2014 seconds to a 
+		time of 0.1269 seconds. For the cow we went from a speed up of 30.5637 sec to 0.198 sec. Finally for the 
+		teapot we went from 10.8 sec to 0.2301 sec.
+		Overall, based on the BVH acceleration statistics it can be seen that leveraging the BVH will be extremely useful when checking ray intersections when tracing rays. 
+		While the introduction of BVH meant that we would need to build the BVH before we could render the image, the trade time it takes to create the
+		BVH is much smaller than the time saved by using BVH Acceleration for the rendering.
+		Specifically, the use of a BVH reduces the ray intersection complexity from <code>O(n)</code> to <code>O(log(n))</code>.
+	 </p>
+	 
 
 	<h2 align="middle">Part 3: Direct Illumination</h2>
 
 	<h2 align="middle">Part 4: Global Illumination</h2>
 
 	<h2 align="middle">Part 5: Adaptive Sampling</h2>
-
+	<p>
+	   In the previous part, Monte Carlo path tracing was implemented in order to generate the realistic images.
+	   However, there is a significant amount of noise can be generated using that approach, which could actually be mitigated by increasing the number of samples used per pixel.
+	   While in theory such an approach would suffice, it is worth noting that every pixel does not converge at the same rate.
+	   Therefore, in this section I implemented adaptive sampling to concentrate sampling in more difficult regions of the image, by gathering statistics for a pixel's current sampling in order to determine whether the pixel has converged.
+	   If a pixel has converged, then there is no need to continue sampling until the fixed (high) number of samples is reached -- the pixel's radiance can be set immediately after convergence.
+	   <br>
+	   <br>
+	   In order to implement adaptive sampling, I updated the <code>raytrace_pixel(...)</code> method to incorporate a convergence check to evaluate whether the current pixel in question has converged or not.
+	   At a high level, I tracked the mean and standard deviation of the current <code>n</code> traced samples through a pixel (<code>n</code> represents the number of samples taken until the pixel has converged):
+	   $$\mu = \frac{s_1}{n}$$
+	   $$\sigma^2 = \frac{1}{n - 1}(s_2 - \frac{s_1^2}{n})$$
+	   I used two variables <code>s1</code> and <code>s2</code> to accumulate every sample's illuminance in order to calculate &mu; and &sigma;:
+	   $$s_1 = \sum_{k=1}^{n} x_k$$
+	   $$s_2 = \sum_{k=1}^{n} x_k^2$$
+	   Using the mean and the standard deviation, <code>I</code> can be calculated for the convergence check:
+	   $$ I = 1.96 (\frac{\sigma}{\sqrt{n}})$$
+	   A pixel will be considered convereged when <code> I <= maxTolerance * &mu;</code>.
+	   When a pixel is converged, there is no longer a need to gather more samples for the pixel, therefore the <code>sampleBuffer</code> and <code>sampleCountBuffer</code> can be updated accordingly.
+	   <br>
+	   <br>
+	   Within my code, I initialized <code>float s1</code>, <code>float s2</code>, and <code>size_t samples_taken</code> in order to implement adaptive sampling.
+	   <code>s1</code> and <code>s2</code> are as defined above, where they will accumulate the scene radiance's illumination and the illumination squared.
+	   Within the main for-loop in <code>raytrace_pixel(...)</code> I added a check to see if a batch of samples have been processed (<code> if (samples_taken > 0 && samples_taken % samplesPerBatch == 0)</code>).
+	   I added the <code>samples_taken > 0</code> condition to the check in order to ensure that on the first iteration (when <code>samples_taken = 0</code>), I do not erroneously divide by zero when evaluating the statistics and checking the cut-off condition.
+	   Moreover, I only checked the cut-off statistic for once a batch of samples were processed, which was defined via <code>samplesPerBatch</code>. Only checking the pixel's convergence once a batch of samples have been processed helps reduce the need to compute <code>I</code> and evaluate the cut-off for every pixel sample.
+	   If the pixel has converged, then I updated <code>sampleBuffer</code> such that the pixel gets the average illuminance across the samples that were taken: <code>sampleBuffer.update_pixel(aggregate_scene_radiance / samples_taken, x, y);</code>.
+	   I also ensured that <code>sampleCountBuffer</code> was updated repsectively to reflect the number of samples taken for the pixel: <code>sampleCountBuffer[x + y * sampleBuffer.w] = samples_taken;</code>
+	   <br>
+	   <br>
+	   This part was straightforward to implement, therefore I did not run into any eventful debugging scenarios.
+	   <br>
+	   <br>
+	   todo: add images
+	</p>
+	
 
 	<br>
 	<br>
