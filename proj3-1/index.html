@@ -256,6 +256,25 @@
 	</p>
 
 	<p>
+		Task 2 implements 0 bounce illumination by simply taking the intersection passed in, retrieving its bsdf, and returning the emission of said bsdf
+		and returns it through the <code>est_radiance_global_illumination</code> method.
+	</p>
+	
+	<p>
+		Task 3 implements direct lighting with Uniform Hemisphere Sampling. This is done via the <code>estimate_direct_lighting_hemisphere</code> method which is used by 
+		the <code>one_bounce_radiance</code> method that is called in our <code>est_radiance_global_illumination</code> method.
+		Within the <code>estimate_direct_lighting_hemisphere</code> we introduce a sampling loop. This method acts to calculate the radiance for a point via a
+		Monte Carlo Estimator. This loop runs <code>num_samples</code> times and within each loop gets the sample from the Unit Hemisphere. 
+		With this sample, we create a new ray to check for intersections with the light source. Using this newly created ray we check for an intersection with the light 
+		source, and if there is one then direct light falls onto the point. Since this is the case we want to add the reflectance for this
+		sample to the overall total via <code>Vector3D znormal = Vector3D(0, 0, 1);float cosval = dot(znormal, dir_sample);L_out += (f * l * cosval);</code>
+		Finally we need to take into account the probability of each sample having occured. Since we are working with a hemisphere it is
+		2 pi. As such to get the final value we do the following <code>L_out = L_out * ((2.0 * PI) / num_samples);</code> We then modified 
+		1-bounce to choose this if <code>direct_hemisphere_sample</code> is true and modified <code>est_radiance_global_illumination</code>
+		to return the sum of the 0 and 1-bounce values.
+	</p>
+
+	<p>
 		Here are some images rendered using the two different lighting functions. Overall, we can notice that between the two, importance light 
 		sampling created less noisy images with the lighting and shadows being more smooth which is expected behavior.
 	</p>
