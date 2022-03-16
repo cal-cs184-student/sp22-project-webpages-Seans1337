@@ -175,6 +175,7 @@
 					<figcaption align="middle"><i>dae/sky/CBlucy.dae</i></figcaption>
 				</td>
 			</tr>
+			<br>
 			<tr>
 				<td>
 					<img src="img/part2/beast.png" align="middle" width="500px" />
@@ -221,6 +222,7 @@
 					<figcaption align="middle">CBbunny with light sampling</figcaption>
 				</td>
 			</tr>
+			<br>
 			<tr>
 				<td>
 					<img src="img/part3/hemi/CBcoil_H_64_32.png" align="middle" width="500px" />
@@ -231,6 +233,7 @@
 					<figcaption align="middle">CBcoil with light sampling</figcaption>
 				</td>
 			</tr>
+			<br>
 			<tr>
 				<td>
 					<img src="img/part3/hemi/CBlucy_H_64_32.png" align="middle" width="500px" />
@@ -239,6 +242,39 @@
 				<td>
 					<img src="img/part3/light/CBlucy_64_32.png" align="middle" width="500px" />
 					<figcaption align="middle">CBlucy with light sampling</figcaption>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br>
+
+	<p>
+		We can analyze the affect of the number of light rays on the noise levels in soft shadows by looking at
+		the rendering of <i>dae/sky/dragon.dae</i>. The images are rendered with 1, 4, 16, and 64 light rays and 
+		1 sample per pixel. As we can see from the different images, by increasing our number of light rays we are
+		able to decrease the amount of noise in the shadows.
+	</p>
+	<div align="middle">
+		<table style="width=100%">
+			<tr>
+				<td>
+					<img src="img/part3/light/dragon_1_1.png" align="middle" width="500px" />
+					<figcaption align="middle">1 Light Ray Dragon</figcaption>
+				</td>
+				<td>
+					<img src="img/part3/light/dragon_1_4.png" align="middle" width="500px" />
+					<figcaption align="middle">4 Light Ray Dragon</figcaption>
+				</td>
+			</tr>
+			<br>
+			<tr>
+				<td>
+					<img src="img/part3/light/dragon_1_16.png" align="middle" width="500px" />
+					<figcaption align="middle">16 Light Ray Dragon</figcaption>
+				</td>
+				<td>
+					<img src="img/part3/light/dragon_1_64.png" align="middle" width="500px" />
+					<figcaption align="middle">64 Light Ray Dragon</figcaption>
 				</td>
 			</tr>
 		</table>
