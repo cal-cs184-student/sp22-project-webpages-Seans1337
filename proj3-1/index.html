@@ -278,18 +278,18 @@
 	</p>
 
 	<p>
-		Task 4 implements direct lighting via Importance Sampling Lights. Instead of sampling uniform directions from in a hemisphere we now want to
+		Task 4 implements direct lighting via Importance Sampling Lights. Instead of sampling uniform directions from inside a hemisphere, we now want to
 		sample all the lights directly. This is implemented via our <code>estimate_direct_lighting_importance</code> method and called similarly to
 		<code>est_radiance_global_illumination</code> in our <code>one_bounce_radiance</code> method. At a high level, for each light in the scene
 		we sample directions between the light source and <code>hit_p</code> and if we cast a ray in this direction and there is no other object
 		between the hit and light source then we know our light source does cast light onto the hit point. The process within our code goes as follows.
-		In order to get the correct radiance we loop over all of the <code>SceneLight</code> within our scene. For each of these light sources, if it 
+		In order to get the correct radiance, we loop over all of the <code>SceneLight</code> within our scene. For each of these light sources, if it 
 		is not a point light then we know that we need to sample this light <code>ns_area_light</code> times, else we simply sample one time.
-		We then create a temporary Vector3D to accumulate the total raidance for this light source. Since we know how many samples we want to take,
+		We then create a temporary Vector3D to accumulate the total radiance for this light source. Since we know how many samples we want to take,
 		we now do a loop <code>num_samples</code> times. Within each of the samples we need to calculate the emitted_radiance which we do by calling 
 		<code>emitted_radiance = (*light)->sample_L(hit_p, &dir_sample, &dist_to_light, &pdf);</code>. We also have to create a new ray to check for 
-		intersections like we mentioned at the high level. This ray will be used to check if there are any intersections in between. We also 
-		make sure to compute the cosine term for the relectance equation and convert from world coordinates to object coordinates for the sample. If
+		intersections as we mentioned at the high level. This ray will be used to check if there are any intersections in between. We also 
+		make sure to compute the cosine term for the reflectance equation and convert from world coordinates to object coordinates for the sample. If
 		there is no intersection then we can go ahead and get the BSDF and use that value to calculate the radiance for our current sample and add it to the
 		total: <code>L_out_per_light += (f * emitted_radiance * cosval) / pdf;</code>. After we go through all the samples we add to the total
 		radiance for each light source the average of the current light source: <code>L_out += (L_out_per_light / num_samples);</code>. 
