@@ -366,8 +366,8 @@
 	</p>
 	
 	<p>
-		At this point, in order to determine how and whether to recurse, I first checked if the depth of the new ray is greater than 0 (this means there are more bounces to consider) and that there was an intersection (as mentioned above).
-		If the condition (<code>r2.depth > 0 && bvh->intersect(r2, &isect2)</code>) is true, then I recurse on the new ray. If there is no intersection, then no recursion will happen since light does not bounce off anything. If the max ray depth has been reached, then no recursion will happen.
+		At this point, in order to determine how and whether to recurse, I first checked if the depth of the current ray is greater than 1 (this means there are more bounces to consider) and that there was an intersection (as mentioned above).
+		If the condition (<code>r.depth > 1 && bvh->intersect(r2, &isect2)</code>) is true, then I recurse on the new ray. If there is no intersection, then no recursion will happen since light does not bounce off anything. If the max ray depth has been reached, then no recursion will happen.
 	</p>
 	
 	<p>
@@ -388,9 +388,167 @@
 		During the implementation of this part, I experienced issues where my rendered scenes and geometries were overexposed. After debugging, I realized that I had to handle the cases of recursion more carefully.
 		In particular, I ensured that I always recursed at least once for indirect illumination. I ensured that I only divided by the continuation probability in the Russian Roulette case as opposed to always.
 	</p>
-	
+	<br><br>
 	<p>
-		todo: add images
+		The following images showcase rendering using global (direct and indirect) illumination. In particular, the images show nice color bleeding in Lambertian scenes.
+		<div align="middle">
+			<table style="width=100%">
+				<tr>
+					<td>
+						<img src="img/part4/global/CBbunny_global_1024_16_5.png" width="500px" />
+						<figcaption align="middle">Global Illumination of CBbunny.dae<br>Rendered using <code>-s 1024 -l 16 -m 5</code></figcaption>
+					</td>
+					<td>
+						<img src="img/part4/global/spheres_global_1024_16_5.png" width="500px" />
+						<figcaption align="middle">Global Illumination of CBspheres_lambertian.dae<br>Rendered using <code>-s 1024 -l 16 -m 5</code></figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<br>
+		<div align="middle">
+			<img src="img/part4/global/dragon_global_1024_16_5.png" width="500px" />
+			<figcaption align="middle">Global Illumination of dragon.dae<br>Rendered using <code>-s 1024 -l 16 -m 5</code></figcaption>
+		</div>
+	</p>
+	<br><br>
+	<p>
+		The following images showcase rendering with only direct illumination and then only indirect illumination. 
+		The lighting is consistent with the direct only and indirect only illumination covered in Lecture 13.
+
+		<div align="middle">
+			<table style="width=100%">
+				<tr>
+					<td>
+						<img src="img/part4/direct/CBbunny_1024_16_5.png" width="500px" />
+						<figcaption align="middle">Direct Only Illumination of CBbunny.dae<br>Rendered using <code>-s 1024 -l 16 -m 5</code></figcaption>
+					</td>
+					<td>
+						<img src="img/part4/indirect/CBbunny_1024_16_2.png" width="500px" />
+						<figcaption align="middle">Indirect Only Illumination of CBbunny.dae<br>Rendered using <code>-s 1024 -l 16 -m 2</code></figcaption>
+					</td>
+				</tr>
+				<br>
+				<tr>
+					<td>
+						<img src="img/part4/direct/CBspheres_lambertian_1024_16_5.png" width="500px" />
+						<figcaption align="middle">Direct Only Illumination of CBshperes_lambertian.dae<br>Rendered using <code>-s 1024 -l 16 -m 5</code></figcaption>
+					</td>
+					<td>
+						<img src="img/part4/indirect/CBspheres_1024_16_2.png" width="500px" />
+						<figcaption align="middle">Indirect Only Illumination of CBspheres_lambertian.dae<br>Rendered using <code>-s 1024 -l 16 -m 2</code></figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</p>
+	<br><br>
+	<p>
+		The following images showcase rendering <i>CBbunny.dae</i> with varying values for <code>max_ray_depth</code>.
+		<code>max_ray_depth</code> will dictate how many indirect bounces to consider in global illumination.
+		In particular, as the <code>max_ray_depth</code> increases it can be seen that the images lighting seems to converge.
+		This is due to the fact that the contribution of higher bounces decrease exponentially. 
+		Therefore, there is an inherent tradeoff when rendering complex scenes -- if it is possible to roughly get the same image without the need for computing extra bounces, then that should be opted for.
+		More generally, it can be seen that increasing the <code>max_ray_depth</code> results in brightening the image overall.
+
+		<div align="middle">
+			<table style="width=100%">
+				<tr>
+					<td>
+						<img src="img/part4/CBbunny/CBbunny_1024_16_0.png" width="500px" />
+						<figcaption align="middle">CBbunny.dae with max ray depth 0<br>Rendered using <code>-s 1024 -l 16 -m 0</code></figcaption>
+					</td>
+					<td>
+						<img src="img/part4/CBbunny/CBbunny_1024_16_1.png" width="500px" />
+						<figcaption align="middle">CBbunny.dae with max ray depth 1<br>Rendered using <code>-s 1024 -l 16 -m 1</code></figcaption>
+					</td>
+
+				</tr>
+				<br>
+				<tr>
+					<td>
+						<img src="img/part4/CBbunny/CBbunny_1024_16_2.png" width="500px" />
+						<figcaption align="middle">CBbunny.dae with max ray depth 2<br>Rendered using <code>-s 1024 -l 16 -m 2</code></figcaption>
+					</td>
+					<td>
+						<img src="img/part4/CBbunny/CBbunny_1024_16_3.png" width="500px" />
+						<figcaption align="middle">CBbunny.dae with max ray depth 3<br>Rendered using <code>-s 1024 -l 16 -m 3</code></figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div align="middle">
+			<img src="img/part4/CBbunny/CBbunny_1024_16_100.png" width="500px" />
+			<figcaption align="middle">CBbunny.dae with max ray depth 100<br>Rendered using <code>-s 1024 -l 16 -m 100</code></figcaption>
+		</div>
+	</p>
+	<br><br>
+	<p>
+		The following images showcase rendering <i>CBbunny.dae</i> with varying values for the sample pixel rate.
+
+		<div align="middle">
+			<table style="width=100%">
+				<tr>
+					<td>
+						<img src="img/part4/varying_s/CBbunny_1_4_5.png" width="500px" />
+						<figcaption align="middle">CBbunny.dae with sample pixel rate 1<br>Rendered using <code>-s 1 -l 4 -m 5</code></figcaption>
+					</td>
+					<td>
+						<img src="img/part4/varying_s/CBbunny_2_4_5.png" width="500px" />
+						<figcaption align="middle">CBbunny.dae with sample pixel rate 2<br>Rendered using <code>-s 2 -l 4 -m 5</code></figcaption>
+					</td>
+				</tr>
+				<br>
+				<tr>
+					<td>
+						<img src="img/part4/varying_s/CBbunny_4_4_5.png" width="500px" />
+						<figcaption align="middle">CBbunny.dae with sample pixel rate 4<br>Rendered using <code>-s 4 -l 4 -m 5</code></figcaption>
+					</td>
+					<td>
+						<img src="img/part4/varying_s/CBbunny_8_4_5.png" width="500px" />
+						<figcaption align="middle">CBbunny.dae with sample pixel rate 8<br>Rendered using <code>-s 8 -l 4 -m 5</code></figcaption>
+					</td>
+				</tr>
+				<br>
+				<tr>
+					<td>
+						<img src="img/part4/varying_s/CBbunny_16_4_5.png" width="500px" />
+						<figcaption align="middle">CBbunny.dae with sample pixel rate 16<br>Rendered using <code>-s 16 -l 4 -m 5</code></figcaption>
+					</td>
+					<td>
+						<img src="img/part4/varying_s/CBbunny_32_4_5.png" width="500px" />
+						<figcaption align="middle">CBbunny.dae with sample pixel rate 32<br>Rendered using <code>-s 32 -l 4 -m 5</code></figcaption>
+					</td>
+				</tr>
+				<br>
+				<tr>
+					<td>
+						<img src="img/part4/varying_s/CBbunny_64_4_5.png" width="500px" />
+						<figcaption align="middle">CBbunny.dae with sample pixel rate 64<br>Rendered using <code>-s 64 -l 4 -m 5</code></figcaption>
+					</td>
+					<td>
+						<img src="img/part4/varying_s/CBbunny_128_4_5.png" width="500px" />
+						<figcaption align="middle">CBbunny.dae with sample pixel rate 128<br>Rendered using <code>-s 128 -l 4 -m 5</code></figcaption>
+					</td>
+
+				</tr>
+				<br>
+				<tr>
+					<td>
+						<img src="img/part4/varying_s/CBbunny_256_4_5.png" width="500px" />
+						<figcaption align="middle">CBbunny.dae with sample pixel rate 256<br>Rendered using <code>-s 256 -l 4 -m 5</code></figcaption>
+					</td>
+					<td>
+						<img src="img/part4/varying_s/CBbunny_512_4_5.png" width="500px" />
+						<figcaption align="middle">CBbunny.dae with sample pixel rate 512<br>Rendered using <code>-s 512 -l 4 -m 5</code></figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div align="center">
+			<img src="img/part4/varying_s/CBbunny_1024_4_5.png" width="500px" />
+			<figcaption align="middle">CBbunny.dae with sample pixel rate 1024<br>Rendered using <code>-s 1024 -l 4 -m 5</code></figcaption>
+		</div>
 	</p>
 	
 	<h2 align="middle">Part 5: Adaptive Sampling</h2>
@@ -437,7 +595,33 @@
 	   This part was straightforward to implement, therefore I did not run into any eventful debugging scenarios.
 	   <br>
 	   <br>
-	   todo: add images
+	   Here are images showing adaptive sampling being used when ray tracing pixels. 
+	   In particular, for both scenes it can be seen that more complicated areas of the scene and geometric used more samples (i.e. converged slower -- more red) versus other parts used less samples (i.e. converged faster -- more blue).
+	   <div align="middle">
+		<table style="width=100%">
+			<tr>
+				<td>
+					<img src="img/part5/CBbunny_2048_1_5.png" width="500px" />
+					<figcaption align="middle">Noise-free CBbunny.png<br>Rendered using <code>-s 2048 -l 1 -m 5</code></figcaption>
+				</td>
+				<td>
+					<img src="img/part5/CBbunny_2048_1_5_rate.png" width="500px" />
+					<figcaption align="middle">CBbunny rate<br>Rendered using <code>-s 2048 -l 1 -m 5</code></figcaption>
+				</td>
+			</tr>
+			<br>
+			<tr>
+				<td>
+					<img src="img/part5/CBspheres_lambertian_2048_1_5.png" width="500px" />
+					<figcaption align="middle">Noise-free CBspheres_lambertian.png<br>Rendered using <code>-s 2048 -l 1 -m 5</code></figcaption>
+				</td>
+				<td>
+					<img src="img/part5/CBspheres_lambertian_2048_1_5_rate.png" width="500px" />
+					<figcaption align="middle">CBspheres_lambertian rate<br>Rendered using <code>-s 2048 -l 1 -m 5</code></figcaption>
+				</td>
+			</tr>
+		</table>
+	</div>
 	</p>
 	
 	<br>
