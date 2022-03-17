@@ -278,6 +278,24 @@
 	</p>
 
 	<p>
+		Task 4 implements direct lighting via Importance Sampling Lights. Instead of sampling uniform directions from in a hemisphere we now want to
+		sample all the lights directly. This is implemented via our <code>estimate_direct_lighting_importance</code> method and called similarly to
+		<code>est_radiance_global_illumination</code> in our <code>one_bounce_radiance</code> method. At a high level, for each light in the scene
+		we sample directions between the light source and <code>hit_p</code> and if we cast a ray in this direction and there is no other object
+		between the hit and light source then we know our light source does cast light onto the hit point. The process within our code goes as follows.
+		In order to get the correct radiance we loop over all of the <code>SceneLight</code> within our scene. For each of these light sources, if it 
+		is not a point light then we know that we need to sample this light <code>ns_area_light</code> times, else we simply sample one time.
+		We then create a temporary Vector3D to accumulate the total raidance for this light source. Since we know how many samples we want to take,
+		we now do a loop <code>num_samples</code> times. Within each of the samples we need to calculate the emitted_radiance which we do by calling 
+		<code>emitted_radiance = (*light)->sample_L(hit_p, &dir_sample, &dist_to_light, &pdf);</code>. We also have to create a new ray to check for 
+		intersections like we mentioned at the high level. This ray will be used to check if there are any intersections in between. We also 
+		make sure to compute the cosine term for the relectance equation and convert from world coordinates to object coordinates for the sample. If
+		there is no intersection then we can go ahead and get the BSDF and use that value to calculate the radiance for our current sample and add it to the
+		total: <code>L_out_per_light += (f * emitted_radiance * cosval) / pdf;</code>. After we go through all the samples we add to the total
+		radiance for each light source the average of the current light source: <code>L_out += (L_out_per_light / num_samples);</code>. 
+	</p>
+
+	<p>
 		Here are some images rendered using the two different lighting functions. Overall, we can notice that between the two, importance light 
 		sampling created less noisy images with the lighting and shadows being more smooth which is expected behavior.
 	</p>
@@ -318,6 +336,15 @@
 		</table>
 	</div>
 	<br>
+
+	<p>
+		Looking at the above images we see a pattern between the uniform hemisphere sampling renders and the light sampling renders.
+		For all of the hemisphere examples the images seem to have much more noisy shadows vs the more smooth shadows of the light sampling
+		method. This can be seen especially on the walls of the image where the hemisphere renders have a very fuzzy haze around the edges
+		while the light sampling renderes have much smoother edges. Additionally, the shadows underneath the models share the same qualities.
+		This is expected as importance lighting is intended to lessen the noise in our renders by sampling all lights directly insetad of 
+		sampling uniform directions in a hemisphere.
+	</p>
 
 	<p>
 		We can analyze the effect of the number of light rays on the noise levels in soft shadows by looking at
@@ -566,10 +593,10 @@
 	
 	<h2 align="middle">Part 5: Adaptive Sampling</h2>
 	<p>
-	   In the previous part, Monte Carlo path tracing was implemented in order to generate the realistic images.
+	   In the previous part, Monte Carlo path tracing was implemented in order to generate realistic images.
 	   However, there is a significant amount of noise can be generated using that approach, which could actually be mitigated by increasing the number of samples used per pixel.
-	   While in theory such an approach would suffice, it is worth noting that every pixel does not converge at the same rate.
-	   Therefore, in this section I implemented adaptive sampling to concentrate sampling in more difficult regions of the image, by gathering statistics for a pixel's current sampling in order to determine whether the pixel has converged.
+	   While in theory, such an approach would suffice, it is worth noting that every pixel does not converge at the same rate.
+	   Therefore, in this section, I implemented adaptive sampling to concentrate sampling in more difficult regions of the image, by gathering statistics for a pixel's current sampling in order to determine whether the pixel has converged.
 	   If a pixel has converged, then there is no need to continue sampling until the fixed (high) number of samples is reached -- the pixel's radiance can be set immediately after convergence.
 	</p>
 	   In order to implement adaptive sampling, I updated the <code>raytrace_pixel(...)</code> method to incorporate a convergence check to evaluate whether the current pixel in question has converged or not.
@@ -596,18 +623,18 @@
 	</div>
 	
 	<p>
-	   A pixel will be considered convereged when <code> I <= maxTolerance * &mu;</code>.
+	   A pixel will be considered converged when <code> I <= maxTolerance * &mu;</code>.
 	   When a pixel is converged, there is no longer a need to gather more samples for the pixel, therefore the <code>sampleBuffer</code> and <code>sampleCountBuffer</code> can be updated accordingly.
 	</p>
 	
 	<p>
 		Within my code, I initialized <code>float s1</code>, <code>float s2</code>, and <code>size_t samples_taken</code> in order to implement adaptive sampling.
 	   <code>s1</code> and <code>s2</code> are as defined above, where they will accumulate the scene radiance's illumination and the illumination squared.
-	   Within the main for-loop in <code>raytrace_pixel(...)</code> I added a check to see if a batch of samples have been processed (<code> if (samples_taken > 0 && samples_taken % samplesPerBatch == 0)</code>).
+	   Within the main for-loop in <code>raytrace_pixel(...)</code> I added a check to see if a batch of samples has been processed (<code> if (samples_taken > 0 && samples_taken % samplesPerBatch == 0)</code>).
 	   I added the <code>samples_taken > 0</code> condition to the check in order to ensure that on the first iteration (when <code>samples_taken = 0</code>), I do not erroneously divide by zero when evaluating the statistics and checking the cut-off condition.
-	   Moreover, I only checked the cut-off statistic for once a batch of samples were processed, which was defined via <code>samplesPerBatch</code>. Only checking the pixel's convergence once a batch of samples have been processed helps reduce the need to compute <code>I</code> and evaluate the cut-off for every pixel sample.
+	   Moreover, I only checked the cut-off statistic once a batch of samples were processed, which was defined via <code>samplesPerBatch</code>. Only checking the pixel's convergence once a batch of samples has been processed helps reduce the need to compute <code>I</code> and evaluate the cut-off for every pixel sample.
 	   If the pixel has converged, then I updated <code>sampleBuffer</code> such that the pixel gets the average illuminance across the samples that were taken: <code>sampleBuffer.update_pixel(aggregate_scene_radiance / samples_taken, x, y);</code>.
-	   I also ensured that <code>sampleCountBuffer</code> was updated repsectively to reflect the number of samples taken for the pixel: <code>sampleCountBuffer[x + y * sampleBuffer.w] = samples_taken;</code>
+	   I also ensured that <code>sampleCountBuffer</code> was updated respectively to reflect the number of samples taken for the pixel: <code>sampleCountBuffer[x + y * sampleBuffer.w] = samples_taken;</code>
 	</p>
 	
 	<p>
@@ -615,8 +642,9 @@
 	</p>
 	
 	<p>
-    	Here are images showing adaptive sampling being used when ray tracing pixels. 
-	   In particular, for both scenes it can be seen that more complicated areas of the scene and geometric used more samples (i.e. converged slower -- more red) versus other parts used less samples (i.e. converged faster -- more blue).
+		Here are images showing adaptive sampling being used when ray tracing pixels. 
+	   In particular, for both scenes, it can be seen that more complicated areas of the scene and geometric used more samples 
+	   (i.e. converged slower -- redder) versus other parts used fewer samples (i.e. converged faster -- bluer).
 	</p>
 
 	<br>
@@ -653,7 +681,7 @@
 		well so that both partners would be on the same page when it comes to the algorithm/functionality of our code. In terms 
 		of coding, One way that we collaborated was through paired programming. We would work on one person's monitor with that 
 		individual coding and the other partner helping by checking the specs/slides/piazza as well as helping debug. When we 
-		didn't do that we would try to split up parts of the work in a divide and conquer fashion. We split up the task of the write up
+		didn't do that we would try to split up parts of the work in a divide and conquer fashion. We split up the task of the write-up
 		by making the individual who worked more on each part write out the explanations. 
 	</p>
 
