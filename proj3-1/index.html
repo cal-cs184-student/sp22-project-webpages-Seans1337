@@ -42,7 +42,7 @@
 	  Part 2, Bounding Volume Hierarchy, focuses on the creation of BVHs for us to figure out intersections of rays and objects.
 	  Part 3, Direct Illumination, focuses on direct illumination as a way for us to render our scenes.
 	  Part 4, Global Illumination, focuses on global illumination as a way for us to render our scenes.
-	  Part 5, Adaptive Sampling, uses adapative sampling to create an image that eliminates the noise of using Monte Carlo sampling.
+	  Part 5, Adaptive Sampling, uses adaptive sampling to create an image that eliminates the noise of using Monte Carlo sampling.
 	  
 	</p>
 	
@@ -51,13 +51,13 @@
 		Part 1 aims to create Rays and calculate Ray Intersections. In Task 1 we go about implementing the <code>generate_ray</code>
 		method which aims to take a normalized image coordinate <i>(x, y)</i> and outputs a ray in the world space. We achieve this by
 		transforming the image coordinates to camera space, generating the ray in camera space, and then transforming it into a ray in
-		world space. In order to do the translation to camera space we first calculate the translated position by taking the 
+		world space. In order to do the translation to camera space, we first calculate the translated position by taking the 
 		original position and subtracting it by the translated origin point of <code>Vector2D(0.5, 0.5)</code>. Using this we calclate the 
 		camera space coordinates by creating the Vector3D in camera space: 
 		<code>Vector3D(translated_pos[0] * 2 * tan(hFov_rads * 0.5), translated_pos[1] * 2 * tan(vFov_rads * 0.5), -1)</code> where
 		<code>hFov_rads</code> and <code>vFov_rads</code> are the hFov and vFov but in radians since the trig functions use radians.
 		We then transform the direction of the ray back into world space by first multiplying the calculated ray by <code>c2w</code> , 
-		the camera-to-world rotation matrix, and then normalizing. Finally we create a ray for the world space based on this transformed 
+		the camera-to-world rotation matrix, and then normalizing. Finally, we create a ray for the world space based on this transformed 
 		direction vector and the <code>pos</code>, the camera position in the world space. 
 	</p>
 
@@ -66,6 +66,7 @@
 		After implementing Task 2 we were able to generate images such as the following.
 	</p>
 
+	<br>
 	<div align="middle">
 		<table style="width=100%">
 			<tr>
@@ -83,33 +84,35 @@
 	<br>
 
 	<p>
-		Tasks 3 and 4 aim to calculate ray-primitive intersections. For the triangle intersection algorithm we check whether or 
+		Tasks 3 and 4 aim to calculate ray-primitive intersections. For the triangle intersection algorithm, we check whether or 
 		not a ray is intersecting a triangle object. To do this we implemented the Moller Trumbore Algorithm 
 		(done by a helper function <code>moller_trumbore_algo(const Ray &r)</code>), referenced in Lecture 9 Slide 22
-		and Discussion 5. Within this algorithm we create 5 <code>Vector3D</code> objects. These objects represent the 2 edges of the triangle 
+		and Discussion 5. Within this algorithm, we create 5 <code>Vector3D</code> objects. These objects represent the 2 edges of the triangle 
 		involving <code>p1</code> (<code>e1, e2</code>), the vector from the ray origin to <code>p1</code> (<code>s</code>), the cross product of
 		the direction of the ray and <code>e2</code> (<code>s1</code>), and the cross product of <code>s</code> and <code>e1</code>
-		<code>(s2)</code>. Using these 5 vectors we then calcualte the resulting vector which is returned as follows:
+		<code>(s2)</code>. Using these 5 vectors we then calculate the resulting vector which is returned as follows:
 		<code>(1.0 / dot(s1, e1)) * Vector3D(dot(s2, e2), dot(s1, s), dot(s2, r.d))</code>. The resulting vector gives us a point of intersection at the 0th index
 		and the Barycentric coordinates of beta and gamma at the other indices. Using this resulting vector we can calculate the Barycentric
 		coordinate for alpha by doing <code>1 - beta - gamma</code> and checking if the Barycentric coordinate is valid by ensuring that
 		all values are greater than or equal to zero and less than or equal to 1. Once we have verified the Barycentric coordinate we must then
 		check whether the intersection point is valid by making sure it is greater than or equal to 0 and the <code>r.min_t</code> as well
-		as it is less tahn or equal to the <code>r.max_t</code>. If any of these cases fail there is not an intersection. If a valid intersection has occured
+		as it is less than or equal to the <code>r.max_t</code>. If any of these cases fail there is not an intersection. If a valid intersection has occurred
 		we want to update the <code>Intersection *isect</code> object with the information of the intersection as well as updating 
 		<code>r.max_t</code> to be the t at the intersection.
 	</p>
 
 	<p>
 		The sphere intersection algorithm is similar in that we first check to make sure that the ray and the Sphere object intersect. 
-		Instead of using the Moller Trumbore Algorithm we can figure out if there is an intersection by solving a quadratic equation 
-		using the dot product of the direction of r, the dot product of 2 times the distance between the ray origin and sphere origin
+		Instead of using the Moller Trumbore Algorithm, we can figure out if there is an intersection by solving a quadratic equation 
+		using the dot product of the direction of r, the dot product of 2 times the distance between the ray origin and sphere origin,
 		and the direction of r, and the dot product of the difference between the two origins subtracted by the radius squared. If the
 		resulting t is valid, then we have a valid intersection. After this, it is similar to the Triangle algorithm where we 
 		want to update the <code>Intersection</code> object and the <code>r.max_t</code>.
 	</p>
 
 	<p>After implementing Tasks 3 and 4 we can now render scenes with objects in them.</p>
+
+	<br>
 	<div align="center">
 		<table style="width=100%">
 			<tr>
@@ -133,12 +136,12 @@
 	<h2 align="middle">Part 2: Bounding Volume Hierarchy</h2>
 	<p>
 		With more complex geometries and scenes, there will inherently be more primitives, which means tracing rays and detecting intersections will be computationally expensive.
-		In order to make ray tracing more efficient, a bounding volume hierarchy can be implemented to enable traversing the complex geometries and scenes faster.
+		In order to make ray tracing more efficient, a bounding volume hierarchy can be implemented to enable traversing complex geometries and scenes faster.
 	</p>
 
 	<p>
 		In order to construct the BVH, I first determined the bounding box for the overall scene.
-		I did this by utilizing the primitive iterators <code>start</code> and <code>end</code>.
+		I did this by utilizing the primitive iterator's <code>start</code> and <code>end</code>.
 		I created a variable <code>bbox</code> to represent the overall scene's bounding box, and then while iterating over each primitive, I would expand <code>bbox</code> with the bounding box of the current primitive.
 	</p>
 	
@@ -149,7 +152,7 @@
 	</p>
 	
 	<p>
-		In the event that the the number of primitives was more than <code>max_leaf_size</code>, I would create an interior node.
+		In the event that the number of primitives was more than <code>max_leaf_size</code>, I would create an interior node.
 		When creating a new interior node, I set <code>node->start</code> and <code>node->end</code> to <code>NULL</code>, since an interior node does not contain reference to primitives.
 		However, I set <code>node->l</code> and <code>node->r</code> by invoking a recursive call to resolve each respective child node.
 		I calculate the mean centroid of all the provided primitives and calculate the longest axis to divide on in order to divide the given primitives between the left and right child of the interior node.
@@ -163,7 +166,7 @@
 		The pivot value was determined by indexing into <code>bbox.extent</code> using the index corresponding to the axis being split on.
 		Now, I created a new iterator variable <code>mid</code> which would be used to define the ending iterator for the left child's recursive call and the starting iterator for the right child's recursive call.
 		Before invoking the recursive calls, I also ensured that the left and right groupings had at least 1 primitive (this is done to ensure that infinite recursion and an eventual segfault are avoided).
-		If there was a scenario where either group did not have a primitve, I would either increment or decrement <code>mid</code> in order to allocate one primitve to the other group.
+		If there was a scenario where either group did not have a primitive, I would either increment or decrement <code>mid</code> in order to allocate one primitive to the other group.
 		Finally, I set <code>node->l = construct_bvh(start, mid, max_leaf_size);</code> and <code>node->r = construct_bvh(mid, end, max_leaf_size);</code>.
 	</p>
 	
@@ -171,6 +174,7 @@
 		Looking at the cow mesh and stepping through the nodes of our BVH we can get an idea of our algorithm.
 	</p>
 
+	<br>
 	<div align="middle">
 		<table style="width=100%">
 			<tr>
@@ -183,7 +187,6 @@
 					<figcaption align="middle">1st split</figcaption>
 				</td>
 			</tr>
-			<br>
 			<tr>
 				<td>
 					<img src="img/part2/bvh/cow_bvh2.png" width="500px" />
@@ -203,6 +206,7 @@
 		due to the high number of triangles contained within the image.
 	</p>
 	
+	<br>
 	<div align="middle">
 		<table style="width=100%">
 			<tr>
@@ -215,7 +219,6 @@
 					<figcaption align="middle"><i>dae/sky/CBlucy.dae</i></figcaption>
 				</td>
 			</tr>
-			<br>
 			<tr>
 				<td>
 					<img src="img/part2/beast.png" width="500px" />
@@ -233,9 +236,9 @@
 	<p>
 		In order to understand how BVH acceleration helped to speed up our renderings we tested on 3 different meshes, 
 		<i>dae/meshedit/beetle.dae, dae/meshedit/cow.dae, dae/meshedit/teapot.dae</i>. For all 3 of these scenes it was possible to render without
-		BVH acceleration but we saw a huge speed up once we implemented BVH. For the beetle scene we went from a rendering time of 33.2014 seconds to a 
-		time of 0.1269 seconds. For the cow we went from a speed up of 30.5637 sec to 0.198 sec. Finally for the 
-		teapot we went from 10.8 sec to 0.2301 sec.
+		BVH acceleration but we saw a huge speed up once we implemented BVH. For the beetle scene, we went from a rendering time of 33.2014 seconds to a 
+		time of 0.1269 seconds. For the cow, we went from a speed up of 30.5637 sec to 0.198 sec. Finally, for the 
+		teapot, we went from 10.8 sec to 0.2301 sec.
 		Overall, based on the BVH acceleration statistics it can be seen that leveraging the BVH will be extremely useful when checking ray intersections when tracing rays. 
 		While the introduction of BVH meant that we would need to build the BVH before we could render the image, the trade time it takes to create the
 		BVH is much smaller than the time saved by using BVH Acceleration for the rendering.
@@ -268,7 +271,7 @@
 		With this sample, we create a new ray to check for intersections with the light source. Using this newly created ray we check for an intersection with the light 
 		source, and if there is one then direct light falls onto the point. Since this is the case we want to add the reflectance for this
 		sample to the overall total via <code>Vector3D znormal = Vector3D(0, 0, 1);float cosval = dot(znormal, dir_sample);L_out += (f * l * cosval);</code>
-		Finally we need to take into account the probability of each sample having occured. Since we are working with a hemisphere it is
+		Finally we need to take into account the probability of each sample having occurred. Since we are working with a hemisphere it is
 		2 pi. As such to get the final value we do the following <code>L_out = L_out * ((2.0 * PI) / num_samples);</code> We then modified 
 		1-bounce to choose this if <code>direct_hemisphere_sample</code> is true and modified <code>est_radiance_global_illumination</code>
 		to return the sum of the 0 and 1-bounce values.
@@ -278,6 +281,8 @@
 		Here are some images rendered using the two different lighting functions. Overall, we can notice that between the two, importance light 
 		sampling created less noisy images with the lighting and shadows being more smooth which is expected behavior.
 	</p>
+
+	<br>
 	<div align="middle">
 		<table style="width=100%">
 			<tr>
@@ -290,7 +295,6 @@
 					<figcaption align="middle">CBbunny with light sampling</figcaption>
 				</td>
 			</tr>
-			<br>
 			<tr>
 				<td>
 					<img src="img/part3/hemi/CBcoil_H_64_32.png" width="500px" />
@@ -301,7 +305,6 @@
 					<figcaption align="middle">CBcoil with light sampling</figcaption>
 				</td>
 			</tr>
-			<br>
 			<tr>
 				<td>
 					<img src="img/part3/hemi/CBlucy_H_64_32.png" width="500px" />
@@ -317,11 +320,13 @@
 	<br>
 
 	<p>
-		We can analyze the affect of the number of light rays on the noise levels in soft shadows by looking at
+		We can analyze the effect of the number of light rays on the noise levels in soft shadows by looking at
 		the rendering of <i>dae/sky/dragon.dae</i>. The images are rendered with 1, 4, 16, and 64 light rays and 
 		1 sample per pixel. As we can see from the different images, by increasing our number of light rays we are
 		able to decrease the amount of noise in the shadows.
 	</p>
+	
+	<br>
 	<div align="middle">
 		<table style="width=100%">
 			<tr>
@@ -334,7 +339,6 @@
 					<figcaption align="middle">4 Light Ray Dragon</figcaption>
 				</td>
 			</tr>
-			<br>
 			<tr>
 				<td>
 					<img src="img/part3/light/dragon_1_16.png" width="500px" />
@@ -361,7 +365,9 @@
 	<p>
 		Specifically, given the input ray <code>r</code> and the intersection <code>isect</code>, I determined the <code>emitted_radiance</code> and populated <code>pdf</code> and <code>dir_sample</code> by invoking <code>isect.bsdf->sample_f(w_out, &dir_sample, &pdf);</code>.
 		I then utilized <code>dir_sample</code>, which was populated by the function call to <code>sample_f(...)</code>, to obtain the direction of the new ray in world coordinates.
-		Now, I was able to create a new ray <code>r2</code> which would be used to trace the next intersection (this is used to trace an inverse path). For this new ray <code>r2</code>, I set the <code>r2.min_t = EPS_F</code> to offset the range of valid intersections and I set the depth of the new ray <code>r2->depth = r->depth - 1;</code> to account for traversing depth of rays (note: I also updated <code>raytrace_pixel(...)</code> to intialize a camera's ray depth to be <code>max_ray_depth</code>).
+		Now, I was able to create a new ray <code>r2</code> which would be used to trace the next intersection (this is used to trace an inverse path). 
+		For this new ray <code>r2</code>, I set the <code>r2.min_t = EPS_F</code> to offset the range of valid intersections and I set the depth of the new ray <code>r2->depth = r->depth - 1;</code> 
+		to account for traversing depth of rays (note: I also updated <code>raytrace_pixel(...)</code> to initialize a camera's ray depth to be <code>max_ray_depth</code>).
 		As mentioned above, in order to trace the inverse path, I created a new intersection object <code>isect2</code>, which is used in conjunction with the new ray to check for an intersection by invoking <code>bvh->intersect(r2, &isect2)</code>.		
 	</p>
 	
@@ -371,7 +377,8 @@
 	</p>
 	
 	<p>
-		Now, I will explain the more granular cases for when recursion should happen. If <code>max_ray_depth > 1</code> (indirect illumination is turned on) and the new ray's depth <code>r2->depth</code> is equal to <code>max_ray_depth - 1</code>, then this is the scenario where at least one indirect bounce is traced (regardless of Russian Roulette).
+		Now, I will explain the more granular cases for when recursion should happen. If <code>max_ray_depth > 1</code> (indirect illumination is turned on) and the new ray's depth <code>r2->depth</code> 
+		is equal to <code>max_ray_depth - 1</code>, then this is the scenario where at least one indirect bounce is traced (regardless of Russian Roulette).
 		In this case, I recurse to find the radiance by invoking <code>at_least_one_bounce_radiance(r2, isect2)</code> and update <code>L_out</code> by following the reflectance equation: <code>L_out += (emitted_radiance * l * cosval) / pdf</code>.
 		If <code>(r2.depth == max_ray_depth - 1 && max_ray_depth > 1)</code> is false (i.e. not the case described above), then I will continue to recurse as dictated by Russian Roulette.
 		I created a variable to store a boolean flag <code>continue_bouncing</code> to determine whether to continue the recursion.
@@ -388,168 +395,174 @@
 		During the implementation of this part, I experienced issues where my rendered scenes and geometries were overexposed. After debugging, I realized that I had to handle the cases of recursion more carefully.
 		In particular, I ensured that I always recursed at least once for indirect illumination. I ensured that I only divided by the continuation probability in the Russian Roulette case as opposed to always.
 	</p>
-	<br><br>
+
 	<p>
 		The following images showcase rendering using global (direct and indirect) illumination. In particular, the images show nice color bleeding in Lambertian scenes.
-		<div align="middle">
-			<table style="width=100%">
-				<tr>
-					<td>
-						<img src="img/part4/global/CBbunny_global_1024_16_5.png" width="500px" />
-						<figcaption align="middle">Global Illumination of CBbunny.dae<br>Rendered using <code>-s 1024 -l 16 -m 5</code></figcaption>
-					</td>
-					<td>
-						<img src="img/part4/global/spheres_global_1024_16_5.png" width="500px" />
-						<figcaption align="middle">Global Illumination of CBspheres_lambertian.dae<br>Rendered using <code>-s 1024 -l 16 -m 5</code></figcaption>
-					</td>
-				</tr>
-			</table>
-		</div>
-		<br>
-		<div align="middle">
-			<img src="img/part4/global/dragon_global_1024_16_5.png" width="500px" />
-			<figcaption align="middle">Global Illumination of dragon.dae<br>Rendered using <code>-s 1024 -l 16 -m 5</code></figcaption>
-		</div>
 	</p>
-	<br><br>
+
+	<br>
+	<div align="middle">
+		<table style="width=100%">
+			<tr>
+				<td>
+					<img src="img/part4/global/CBbunny_global_1024_16_5.png" width="500px" />
+					<figcaption align="middle">Global Illumination of CBbunny.dae<br>Rendered using <code>-s 1024 -l 16 -m 5</code></figcaption>
+				</td>
+				<td>
+					<img src="img/part4/global/spheres_global_1024_16_5.png" width="500px" />
+					<figcaption align="middle">Global Illumination of CBspheres_lambertian.dae<br>Rendered using <code>-s 1024 -l 16 -m 5</code></figcaption>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br>
+
+	<div align="middle">
+		<img src="img/part4/global/dragon_global_1024_16_5.png" width="500px" />
+		<figcaption align="middle">Global Illumination of dragon.dae<br>Rendered using <code>-s 1024 -l 16 -m 5</code></figcaption>
+	</div>
+	<br>
+
 	<p>
 		The following images showcase rendering with only direct illumination and then only indirect illumination. 
 		The lighting is consistent with the direct only and indirect only illumination covered in Lecture 13.
-
-		<div align="middle">
-			<table style="width=100%">
-				<tr>
-					<td>
-						<img src="img/part4/direct/CBbunny_1024_16_5.png" width="500px" />
-						<figcaption align="middle">Direct Only Illumination of CBbunny.dae<br>Rendered using <code>-s 1024 -l 16 -m 5</code></figcaption>
-					</td>
-					<td>
-						<img src="img/part4/indirect/CBbunny_1024_16_2.png" width="500px" />
-						<figcaption align="middle">Indirect Only Illumination of CBbunny.dae<br>Rendered using <code>-s 1024 -l 16 -m 2</code></figcaption>
-					</td>
-				</tr>
-				<br>
-				<tr>
-					<td>
-						<img src="img/part4/direct/CBspheres_lambertian_1024_16_5.png" width="500px" />
-						<figcaption align="middle">Direct Only Illumination of CBshperes_lambertian.dae<br>Rendered using <code>-s 1024 -l 16 -m 5</code></figcaption>
-					</td>
-					<td>
-						<img src="img/part4/indirect/CBspheres_1024_16_2.png" width="500px" />
-						<figcaption align="middle">Indirect Only Illumination of CBspheres_lambertian.dae<br>Rendered using <code>-s 1024 -l 16 -m 2</code></figcaption>
-					</td>
-				</tr>
-			</table>
-		</div>
 	</p>
-	<br><br>
+
+	<br>
+	<div align="middle">
+		<table style="width=100%">
+			<tr>
+				<td>
+					<img src="img/part4/direct/CBbunny_1024_16_5.png" width="500px" />
+					<figcaption align="middle">Direct Only Illumination of CBbunny.dae<br>Rendered using <code>-s 1024 -l 16 -m 5</code></figcaption>
+				</td>
+				<td>
+					<img src="img/part4/indirect/CBbunny_1024_16_2.png" width="500px" />
+					<figcaption align="middle">Indirect Only Illumination of CBbunny.dae<br>Rendered using <code>-s 1024 -l 16 -m 2</code></figcaption>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<img src="img/part4/direct/CBspheres_lambertian_1024_16_5.png" width="500px" />
+					<figcaption align="middle">Direct Only Illumination of CBshperes_lambertian.dae<br>Rendered using <code>-s 1024 -l 16 -m 5</code></figcaption>
+				</td>
+				<td>
+					<img src="img/part4/indirect/CBspheres_1024_16_2.png" width="500px" />
+					<figcaption align="middle">Indirect Only Illumination of CBspheres_lambertian.dae<br>Rendered using <code>-s 1024 -l 16 -m 2</code></figcaption>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br>
+
 	<p>
 		The following images showcase rendering <i>CBbunny.dae</i> with varying values for <code>max_ray_depth</code>.
 		<code>max_ray_depth</code> will dictate how many indirect bounces to consider in global illumination.
-		In particular, as the <code>max_ray_depth</code> increases it can be seen that the images lighting seems to converge.
-		This is due to the fact that the contribution of higher bounces decrease exponentially. 
+		In particular, as the <code>max_ray_depth</code> increases, it can be seen that the image's lighting seems to converge.
+		This is due to the fact that the contribution of higher bounces decreases exponentially. 
 		Therefore, there is an inherent tradeoff when rendering complex scenes -- if it is possible to roughly get the same image without the need for computing extra bounces, then that should be opted for.
 		More generally, it can be seen that increasing the <code>max_ray_depth</code> results in brightening the image overall.
-
-		<div align="middle">
-			<table style="width=100%">
-				<tr>
-					<td>
-						<img src="img/part4/CBbunny/CBbunny_1024_16_0.png" width="500px" />
-						<figcaption align="middle">CBbunny.dae with max ray depth 0<br>Rendered using <code>-s 1024 -l 16 -m 0</code></figcaption>
-					</td>
-					<td>
-						<img src="img/part4/CBbunny/CBbunny_1024_16_1.png" width="500px" />
-						<figcaption align="middle">CBbunny.dae with max ray depth 1<br>Rendered using <code>-s 1024 -l 16 -m 1</code></figcaption>
-					</td>
-
-				</tr>
-				<br>
-				<tr>
-					<td>
-						<img src="img/part4/CBbunny/CBbunny_1024_16_2.png" width="500px" />
-						<figcaption align="middle">CBbunny.dae with max ray depth 2<br>Rendered using <code>-s 1024 -l 16 -m 2</code></figcaption>
-					</td>
-					<td>
-						<img src="img/part4/CBbunny/CBbunny_1024_16_3.png" width="500px" />
-						<figcaption align="middle">CBbunny.dae with max ray depth 3<br>Rendered using <code>-s 1024 -l 16 -m 3</code></figcaption>
-					</td>
-				</tr>
-			</table>
-		</div>
-		<div align="middle">
-			<img src="img/part4/CBbunny/CBbunny_1024_16_100.png" width="500px" />
-			<figcaption align="middle">CBbunny.dae with max ray depth 100<br>Rendered using <code>-s 1024 -l 16 -m 100</code></figcaption>
-		</div>
 	</p>
-	<br><br>
+
+	<br>
+	<div align="middle">
+		<table style="width=100%">
+			<tr>
+				<td>
+					<img src="img/part4/CBbunny/CBbunny_1024_16_0.png" width="500px" />
+					<figcaption align="middle">CBbunny.dae with max ray depth 0<br>Rendered using <code>-s 1024 -l 16 -m 0</code></figcaption>
+				</td>
+				<td>
+					<img src="img/part4/CBbunny/CBbunny_1024_16_1.png" width="500px" />
+					<figcaption align="middle">CBbunny.dae with max ray depth 1<br>Rendered using <code>-s 1024 -l 16 -m 1</code></figcaption>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<img src="img/part4/CBbunny/CBbunny_1024_16_2.png" width="500px" />
+					<figcaption align="middle">CBbunny.dae with max ray depth 2<br>Rendered using <code>-s 1024 -l 16 -m 2</code></figcaption>
+				</td>
+				<td>
+					<img src="img/part4/CBbunny/CBbunny_1024_16_3.png" width="500px" />
+					<figcaption align="middle">CBbunny.dae with max ray depth 3<br>Rendered using <code>-s 1024 -l 16 -m 3</code></figcaption>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br>
+
+	<div align="middle">
+		<img src="img/part4/CBbunny/CBbunny_1024_16_100.png" width="500px" />
+		<figcaption align="middle">CBbunny.dae with max ray depth 100<br>Rendered using <code>-s 1024 -l 16 -m 100</code></figcaption>
+	</div>
+	<br>
+
 	<p>
 		The following images showcase rendering <i>CBbunny.dae</i> with varying values for the sample pixel rate.
-
-		<div align="middle">
-			<table style="width=100%">
-				<tr>
-					<td>
-						<img src="img/part4/varying_s/CBbunny_1_4_5.png" width="500px" />
-						<figcaption align="middle">CBbunny.dae with sample pixel rate 1<br>Rendered using <code>-s 1 -l 4 -m 5</code></figcaption>
-					</td>
-					<td>
-						<img src="img/part4/varying_s/CBbunny_2_4_5.png" width="500px" />
-						<figcaption align="middle">CBbunny.dae with sample pixel rate 2<br>Rendered using <code>-s 2 -l 4 -m 5</code></figcaption>
-					</td>
-				</tr>
-				<br>
-				<tr>
-					<td>
-						<img src="img/part4/varying_s/CBbunny_4_4_5.png" width="500px" />
-						<figcaption align="middle">CBbunny.dae with sample pixel rate 4<br>Rendered using <code>-s 4 -l 4 -m 5</code></figcaption>
-					</td>
-					<td>
-						<img src="img/part4/varying_s/CBbunny_8_4_5.png" width="500px" />
-						<figcaption align="middle">CBbunny.dae with sample pixel rate 8<br>Rendered using <code>-s 8 -l 4 -m 5</code></figcaption>
-					</td>
-				</tr>
-				<br>
-				<tr>
-					<td>
-						<img src="img/part4/varying_s/CBbunny_16_4_5.png" width="500px" />
-						<figcaption align="middle">CBbunny.dae with sample pixel rate 16<br>Rendered using <code>-s 16 -l 4 -m 5</code></figcaption>
-					</td>
-					<td>
-						<img src="img/part4/varying_s/CBbunny_32_4_5.png" width="500px" />
-						<figcaption align="middle">CBbunny.dae with sample pixel rate 32<br>Rendered using <code>-s 32 -l 4 -m 5</code></figcaption>
-					</td>
-				</tr>
-				<br>
-				<tr>
-					<td>
-						<img src="img/part4/varying_s/CBbunny_64_4_5.png" width="500px" />
-						<figcaption align="middle">CBbunny.dae with sample pixel rate 64<br>Rendered using <code>-s 64 -l 4 -m 5</code></figcaption>
-					</td>
-					<td>
-						<img src="img/part4/varying_s/CBbunny_128_4_5.png" width="500px" />
-						<figcaption align="middle">CBbunny.dae with sample pixel rate 128<br>Rendered using <code>-s 128 -l 4 -m 5</code></figcaption>
-					</td>
-
-				</tr>
-				<br>
-				<tr>
-					<td>
-						<img src="img/part4/varying_s/CBbunny_256_4_5.png" width="500px" />
-						<figcaption align="middle">CBbunny.dae with sample pixel rate 256<br>Rendered using <code>-s 256 -l 4 -m 5</code></figcaption>
-					</td>
-					<td>
-						<img src="img/part4/varying_s/CBbunny_512_4_5.png" width="500px" />
-						<figcaption align="middle">CBbunny.dae with sample pixel rate 512<br>Rendered using <code>-s 512 -l 4 -m 5</code></figcaption>
-					</td>
-				</tr>
-			</table>
-		</div>
-		<div align="center">
-			<img src="img/part4/varying_s/CBbunny_1024_4_5.png" width="500px" />
-			<figcaption align="middle">CBbunny.dae with sample pixel rate 1024<br>Rendered using <code>-s 1024 -l 4 -m 5</code></figcaption>
-		</div>
 	</p>
+
+	<br>
+	<div align="middle">
+		<table style="width=100%">
+			<tr>
+				<td>
+					<img src="img/part4/varying_s/CBbunny_1_4_5.png" width="500px" />
+					<figcaption align="middle">CBbunny.dae with sample pixel rate 1<br>Rendered using <code>-s 1 -l 4 -m 5</code></figcaption>
+				</td>
+				<td>
+					<img src="img/part4/varying_s/CBbunny_2_4_5.png" width="500px" />
+					<figcaption align="middle">CBbunny.dae with sample pixel rate 2<br>Rendered using <code>-s 2 -l 4 -m 5</code></figcaption>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<img src="img/part4/varying_s/CBbunny_4_4_5.png" width="500px" />
+					<figcaption align="middle">CBbunny.dae with sample pixel rate 4<br>Rendered using <code>-s 4 -l 4 -m 5</code></figcaption>
+				</td>
+				<td>
+					<img src="img/part4/varying_s/CBbunny_8_4_5.png" width="500px" />
+					<figcaption align="middle">CBbunny.dae with sample pixel rate 8<br>Rendered using <code>-s 8 -l 4 -m 5</code></figcaption>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<img src="img/part4/varying_s/CBbunny_16_4_5.png" width="500px" />
+					<figcaption align="middle">CBbunny.dae with sample pixel rate 16<br>Rendered using <code>-s 16 -l 4 -m 5</code></figcaption>
+				</td>
+				<td>
+					<img src="img/part4/varying_s/CBbunny_32_4_5.png" width="500px" />
+					<figcaption align="middle">CBbunny.dae with sample pixel rate 32<br>Rendered using <code>-s 32 -l 4 -m 5</code></figcaption>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<img src="img/part4/varying_s/CBbunny_64_4_5.png" width="500px" />
+					<figcaption align="middle">CBbunny.dae with sample pixel rate 64<br>Rendered using <code>-s 64 -l 4 -m 5</code></figcaption>
+				</td>
+				<td>
+					<img src="img/part4/varying_s/CBbunny_128_4_5.png" width="500px" />
+					<figcaption align="middle">CBbunny.dae with sample pixel rate 128<br>Rendered using <code>-s 128 -l 4 -m 5</code></figcaption>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<img src="img/part4/varying_s/CBbunny_256_4_5.png" width="500px" />
+					<figcaption align="middle">CBbunny.dae with sample pixel rate 256<br>Rendered using <code>-s 256 -l 4 -m 5</code></figcaption>
+				</td>
+				<td>
+					<img src="img/part4/varying_s/CBbunny_512_4_5.png" width="500px" />
+					<figcaption align="middle">CBbunny.dae with sample pixel rate 512<br>Rendered using <code>-s 512 -l 4 -m 5</code></figcaption>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br>
+
+	<div align="center">
+		<img src="img/part4/varying_s/CBbunny_1024_4_5.png" width="500px" />
+		<figcaption align="middle">CBbunny.dae with sample pixel rate 1024<br>Rendered using <code>-s 1024 -l 4 -m 5</code></figcaption>
+	</div>
+	<br>
 	
 	<h2 align="middle">Part 5: Adaptive Sampling</h2>
 	<p>
@@ -558,46 +571,56 @@
 	   While in theory such an approach would suffice, it is worth noting that every pixel does not converge at the same rate.
 	   Therefore, in this section I implemented adaptive sampling to concentrate sampling in more difficult regions of the image, by gathering statistics for a pixel's current sampling in order to determine whether the pixel has converged.
 	   If a pixel has converged, then there is no need to continue sampling until the fixed (high) number of samples is reached -- the pixel's radiance can be set immediately after convergence.
-	   <br>
-	   <br>
+	</p>
 	   In order to implement adaptive sampling, I updated the <code>raytrace_pixel(...)</code> method to incorporate a convergence check to evaluate whether the current pixel in question has converged or not.
 	   At a high level, I tracked the mean and standard deviation of the current <code>n</code> traced samples through a pixel (<code>n</code> represents the number of samples taken until the pixel has converged):
-	   <br>
-	   <div align="middle">
-		   <img src="img/part5/latex1.png"/>
-		</div>
-	   <br>
+	   
+	<div align="middle">
+		<img src="img/part5/latex1.png"/>
+	</div>
+	
+	<p>
 	   I used two variables <code>s1</code> and <code>s2</code> to accumulate every sample's illuminance in order to calculate &mu; and &sigma;:
-	   <br>
-	   <div align="middle">
-			<img src="img/part5/latex2.png" align="middle"/>
-	   </div>
-	   <br>
+	</p>
+
+	<div align="middle">
+		<img src="img/part5/latex2.png" align="middle"/>
+	</div>
+	
+	<p>
 	   Using the mean and the standard deviation, <code>I</code> can be calculated for the convergence check:
-	   <br>  
-	   <div align="middle">
-			<img src="img/part5/latex3.png" align="middle"/>
-	   </div>
-	   <br>
+	</p>
+	
+	<div align="middle">
+		<img src="img/part5/latex3.png" align="middle"/>
+	</div>
+	
+	<p>
 	   A pixel will be considered convereged when <code> I <= maxTolerance * &mu;</code>.
 	   When a pixel is converged, there is no longer a need to gather more samples for the pixel, therefore the <code>sampleBuffer</code> and <code>sampleCountBuffer</code> can be updated accordingly.
-	   <br>
-	   <br>
-	   Within my code, I initialized <code>float s1</code>, <code>float s2</code>, and <code>size_t samples_taken</code> in order to implement adaptive sampling.
+	</p>
+	
+	<p>
+		Within my code, I initialized <code>float s1</code>, <code>float s2</code>, and <code>size_t samples_taken</code> in order to implement adaptive sampling.
 	   <code>s1</code> and <code>s2</code> are as defined above, where they will accumulate the scene radiance's illumination and the illumination squared.
 	   Within the main for-loop in <code>raytrace_pixel(...)</code> I added a check to see if a batch of samples have been processed (<code> if (samples_taken > 0 && samples_taken % samplesPerBatch == 0)</code>).
 	   I added the <code>samples_taken > 0</code> condition to the check in order to ensure that on the first iteration (when <code>samples_taken = 0</code>), I do not erroneously divide by zero when evaluating the statistics and checking the cut-off condition.
 	   Moreover, I only checked the cut-off statistic for once a batch of samples were processed, which was defined via <code>samplesPerBatch</code>. Only checking the pixel's convergence once a batch of samples have been processed helps reduce the need to compute <code>I</code> and evaluate the cut-off for every pixel sample.
 	   If the pixel has converged, then I updated <code>sampleBuffer</code> such that the pixel gets the average illuminance across the samples that were taken: <code>sampleBuffer.update_pixel(aggregate_scene_radiance / samples_taken, x, y);</code>.
 	   I also ensured that <code>sampleCountBuffer</code> was updated repsectively to reflect the number of samples taken for the pixel: <code>sampleCountBuffer[x + y * sampleBuffer.w] = samples_taken;</code>
-	   <br>
-	   <br>
-	   This part was straightforward to implement, therefore I did not run into any eventful debugging scenarios.
-	   <br>
-	   <br>
-	   Here are images showing adaptive sampling being used when ray tracing pixels. 
+	</p>
+	
+	<p>
+		This part was straightforward to implement, therefore I did not run into any eventful debugging scenarios.
+	</p>
+	
+	<p>
+    	Here are images showing adaptive sampling being used when ray tracing pixels. 
 	   In particular, for both scenes it can be seen that more complicated areas of the scene and geometric used more samples (i.e. converged slower -- more red) versus other parts used less samples (i.e. converged faster -- more blue).
-	   <div align="middle">
+	</p>
+
+	<br>
+	<div align="middle">
 		<table style="width=100%">
 			<tr>
 				<td>
@@ -609,7 +632,6 @@
 					<figcaption align="middle">CBbunny rate<br>Rendered using <code>-s 2048 -l 1 -m 5</code></figcaption>
 				</td>
 			</tr>
-			<br>
 			<tr>
 				<td>
 					<img src="img/part5/CBspheres_lambertian_2048_1_5.png" width="500px" />
@@ -622,8 +644,19 @@
 			</tr>
 		</table>
 	</div>
-	</p>
+	<br>
 	
+	<h2 align="middle">Collaboration</h2>
+	<p>
+		Working with a partner went well. Something we learned was that it is important to delegate work at the beginning so 
+		that the amount of work done is more balanced. Additionally, we realized the importance of commenting code/communicating 
+		well so that both partners would be on the same page when it comes to the algorithm/functionality of our code. In terms 
+		of coding, One way that we collaborated was through paired programming. We would work on one person's monitor with that 
+		individual coding and the other partner helping by checking the specs/slides/piazza as well as helping debug. When we 
+		didn't do that we would try to split up parts of the work in a divide and conquer fashion. We split up the task of the write up
+		by making the individual who worked more on each part write out the explanations. 
+	</p>
+
 	<br>
 	<br>
 	<h3 align="middle">Project Webpage Link</h3>
