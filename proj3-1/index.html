@@ -628,7 +628,7 @@
 	</p>
 	
 	<p>
-		Within my code, I initialized <code>float s1</code>, <code>float s2</code>, and <code>size_t samples_taken</code> in order to implement adaptive sampling.
+	   Within my code, I initialized <code>float s1</code>, <code>float s2</code>, and <code>size_t samples_taken</code> in order to implement adaptive sampling.
 	   <code>s1</code> and <code>s2</code> are as defined above, where they will accumulate the scene radiance's illumination and the illumination squared.
 	   Within the main for-loop in <code>raytrace_pixel(...)</code> I added a check to see if a batch of samples has been processed (<code> if (samples_taken > 0 && samples_taken % samplesPerBatch == 0)</code>).
 	   I added the <code>samples_taken > 0</code> condition to the check in order to ensure that on the first iteration (when <code>samples_taken = 0</code>), I do not erroneously divide by zero when evaluating the statistics and checking the cut-off condition.
@@ -638,11 +638,11 @@
 	</p>
 	
 	<p>
-		This part was straightforward to implement, therefore I did not run into any eventful debugging scenarios.
+	   This part was straightforward to implement, therefore I did not run into any eventful debugging scenarios.
 	</p>
 	
-	<p>
-		Here are images showing adaptive sampling being used when ray tracing pixels. 
+	<p> 
+	   Here are images showing adaptive sampling being used when ray tracing pixels.
 	   In particular, for both scenes, it can be seen that more complicated areas of the scene and geometric used more samples 
 	   (i.e. converged slower -- redder) versus other parts used fewer samples (i.e. converged faster -- bluer).
 	</p>
