@@ -51,9 +51,8 @@
 		Part 1 aims to create Rays and calculate Ray Intersections. In Task 1 we go about implementing the <code>generate_ray</code>
 		method which aims to take a normalized image coordinate <i>(x, y)</i> and outputs a ray in the world space. We achieve this by
 		transforming the image coordinates to camera space, generating the ray in camera space, and then transforming it into a ray in
-		world space. In order to do the translation to camera space, we first calculate the translated position by taking the 
-		original position and subtracting it by the translated origin point of <code>Vector2D(0.5, 0.5)</code>. Using this we calclate the 
-		camera space coordinates by creating the Vector3D in camera space: 
+		world space. In order to do the translation to camera space, we first translate our original point and then scale it to transform
+		it from the image to sensor space. We used the following lines to do the transformation:
 		<code>Vector3D(translated_pos[0] * 2 * tan(hFov_rads * 0.5), translated_pos[1] * 2 * tan(vFov_rads * 0.5), -1)</code> where
 		<code>hFov_rads</code> and <code>vFov_rads</code> are the hFov and vFov but in radians since the trig functions use radians.
 		We then transform the direction of the ray back into world space by first multiplying the calculated ray by <code>c2w</code> , 
@@ -270,9 +269,11 @@
 		Monte Carlo Estimator. This loop runs <code>num_samples</code> times and within each loop gets the sample from the Unit Hemisphere. 
 		With this sample, we create a new ray to check for intersections with the light source. Using this newly created ray we check for an intersection with the light 
 		source, and if there is one then direct light falls onto the point. Since this is the case we want to add the reflectance for this
-		sample to the overall total via <code>Vector3D znormal = Vector3D(0, 0, 1);float cosval = dot(znormal, dir_sample);L_out += (f * l * cosval);</code>
+		sample to the overall total. Before doing so we calculate the cosine value by taking the dot product of the znormal and the direction sample from the 
+		hemisphere sampler. This cosine value is used in the reflectance equation. This is handled by the following lines:
+		<br><br><code>Vector3D znormal = Vector3D(0, 0, 1); <br> float cosval = dot(znormal, dir_sample); <br>L_out += (f * l * cosval);</code><br><br>
 		Finally we need to take into account the probability of each sample having occurred. Since we are working with a hemisphere it is
-		2 pi. As such to get the final value we do the following <code>L_out = L_out * ((2.0 * PI) / num_samples);</code> We then modified 
+		2 pi. As such to get the final value we do the following <code>L_out = L_out * ((2.0 * PI) / num_samples);</code>We then modified 
 		1-bounce to choose this if <code>direct_hemisphere_sample</code> is true and modified <code>est_radiance_global_illumination</code>
 		to return the sum of the 0 and 1-bounce values.
 	</p>
