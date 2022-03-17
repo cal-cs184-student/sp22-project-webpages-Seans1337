@@ -51,8 +51,8 @@
 		Part 1 aims to create Rays and calculate Ray Intersections. In Task 1 we go about implementing the <code>generate_ray</code>
 		method which aims to take a normalized image coordinate <i>(x, y)</i> and outputs a ray in the world space. We achieve this by
 		transforming the image coordinates to camera space, generating the ray in camera space, and then transforming it into a ray in
-		world space. In order to do the translation to camera space, we first translate our original point and then scale it to transform
-		it from the image to sensor space. We used the following lines to do the transformation:
+		world space. In order to do the translation to camera space, we first translate our original point by 0.5 in each dimension to obtain <code>translated_pos</code> and then scale it to transform
+		it from the image to sensor space. The scaling transformation was performed on the already translated coordinates as follows:
 		<code>Vector3D(translated_pos[0] * 2 * tan(hFov_rads * 0.5), translated_pos[1] * 2 * tan(vFov_rads * 0.5), -1)</code> where
 		<code>hFov_rads</code> and <code>vFov_rads</code> are the hFov and vFov but in radians since the trig functions use radians.
 		We then transform the direction of the ray back into world space by first multiplying the calculated ray by <code>c2w</code> , 
@@ -61,7 +61,9 @@
 	</p>
 
 	<p>
-		Task 2 asks us to simply generate <code>num_samples</code> camera rays and trace them throughout the scene.
+		Task 2 asks us to simply generate <code>num_samples</code> camera rays and trace them throughout the scene. This was accomplished by invoking <code>gridSampler->getSample()</code> in order to obtain a sample to generate a new sample point.
+		This new sample point <code>sample_pt</code> was normalized and used to create a new ray <code>r</code>. For each sample the <code>scene_radiance</code> was computed by invoking <code>est_radiance_global_illumination(r)</code>.
+		Finally, the <code>sampleBuffer</code> was updated with the average of the scene radiance across the samples.
 		After implementing Task 2 we were able to generate images such as the following.
 	</p>
 
@@ -86,7 +88,8 @@
 		Tasks 3 and 4 aim to calculate ray-primitive intersections. For the triangle intersection algorithm, we check whether or 
 		not a ray is intersecting a triangle object. To do this we implemented the Moller Trumbore Algorithm 
 		(done by a helper function <code>moller_trumbore_algo(const Ray &r)</code>), referenced in Lecture 9 Slide 22
-		and Discussion 5. Within this algorithm, we create 5 <code>Vector3D</code> objects. These objects represent the 2 edges of the triangle 
+		and Discussion 5. In particular, it was ideal to use the Moller Trumbore algorithm because it provides a fast way to calculate the intersection between a ray and a triangle.
+		Within this algorithm, we create 5 <code>Vector3D</code> objects. These objects represent the 2 edges of the triangle 
 		involving <code>p1</code> (<code>e1, e2</code>), the vector from the ray origin to <code>p1</code> (<code>s</code>), the cross product of
 		the direction of the ray and <code>e2</code> (<code>s1</code>), and the cross product of <code>s</code> and <code>e1</code>
 		<code>(s2)</code>. Using these 5 vectors we then calculate the resulting vector which is returned as follows:
@@ -96,17 +99,28 @@
 		all values are greater than or equal to zero and less than or equal to 1. Once we have verified the Barycentric coordinate we must then
 		check whether the intersection point is valid by making sure it is greater than or equal to 0 and the <code>r.min_t</code> as well
 		as it is less than or equal to the <code>r.max_t</code>. If any of these cases fail there is not an intersection. If a valid intersection has occurred
-		we want to update the <code>Intersection *isect</code> object with the information of the intersection as well as updating 
-		<code>r.max_t</code> to be the t at the intersection.
+		we want to update the <code>Intersection *isect</code> object with the information of the intersection:
+		<br><br>
+		<code>isect->t = t;<br>
+        isect->n = (alpha * n1) + (beta * n2) + (gamma * n3);<br>
+        isect->primitive = this;<br>
+        isect->bsdf = get_bsdf();
+		<br></code>
+		<br>
+		Additionally, we updated the ray for <code>r.max_t</code> to be the t at the intersection.
 	</p>
 
 	<p>
 		The sphere intersection algorithm is similar in that we first check to make sure that the ray and the Sphere object intersect. 
-		Instead of using the Moller Trumbore Algorithm, we can figure out if there is an intersection by solving a quadratic equation 
-		using the dot product of the direction of r, the dot product of 2 times the distance between the ray origin and sphere origin,
-		and the direction of r, and the dot product of the difference between the two origins subtracted by the radius squared. If the
+		Instead of using the Moller Trumbore Algorithm (this algorithm is specific to triangles), we can figure out if there is an intersection by solving a quadratic equation (from Lecture 9 Slide 23)
+		using the dot product of the direction of the ray <code>r</code>, the dot product of 2 times the distance between the ray origin and sphere origin,
+		and the direction of the ray <code>r</code>, and the dot product of the difference between the two origins subtracted by the radius squared. If the
 		resulting t is valid, then we have a valid intersection. After this, it is similar to the Triangle algorithm where we 
-		want to update the <code>Intersection</code> object and the <code>r.max_t</code>.
+		want to update the <code>Intersection</code> object and the <code>r.max_t</code>. The main difference was the normal of the intersection was computed as follows:
+		<br><br>
+		<code>        Vector3D intersection_pt = r.o + (i->t * r.d);<br>
+			Vector3D sphere_normal = intersection_pt - this->o;<br>
+			sphere_normal.normalize();</code><br>
 	</p>
 
 	<p>After implementing Tasks 3 and 4 we can now render scenes with objects in them.</p>
@@ -253,13 +267,13 @@
 
 	<p>
 		The first thing that we implemented was Diffuse BSDF which represents the ratio of incoming light scattered from incident direction to outgoing direction.
-		To achieve this we simply return the reflectance of our object divided by pi. This method we created is used in both the
+		To achieve this we simply return the reflectance of our object divided by &pi;. This method we created is used in both the
 		<code>estimate_direct_lighting_importance</code> and <code>estimate_direct_lighting_hemisphere</code> as a part of our radiance calculations.
 	</p>
 
 	<p>
-		Task 2 implements 0 bounce illumination by simply taking the intersection passed in, retrieving its bsdf, and returning the emission of said bsdf
-		and returns it through the <code>est_radiance_global_illumination</code> method.
+		Task 2 implements 0-bounce illumination by simply taking the intersection passed in, retrieving its bsdf, and returning the emission of said bsdf.
+		Additionally, the <code>est_radiance_global_illumination</code> method was updated to invoke a call to <code>zero_bounce_radiance(...)</code> in order to support zero-bounce radiance instead of normal shading.
 	</p>
 	
 	<p>
@@ -272,8 +286,8 @@
 		sample to the overall total. Before doing so we calculate the cosine value by taking the dot product of the znormal and the direction sample from the 
 		hemisphere sampler. This cosine value is used in the reflectance equation. This is handled by the following lines:
 		<br><br><code>Vector3D znormal = Vector3D(0, 0, 1); <br> float cosval = dot(znormal, dir_sample); <br>L_out += (f * l * cosval);</code><br><br>
-		Finally we need to take into account the probability of each sample having occurred. Since we are working with a hemisphere it is
-		2 pi. As such to get the final value we do the following <code>L_out = L_out * ((2.0 * PI) / num_samples);</code>We then modified 
+		Finally we need to take into account the probability of each sample having occurred. Since we are working with a hemisphere, it is
+		2&pi;. As such to get the final value we do the following <code>L_out = L_out * ((2.0 * PI) / num_samples);</code>. We then modified 
 		1-bounce to choose this if <code>direct_hemisphere_sample</code> is true and modified <code>est_radiance_global_illumination</code>
 		to return the sum of the 0 and 1-bounce values.
 	</p>
@@ -289,10 +303,10 @@
 		We then create a temporary Vector3D to accumulate the total radiance for this light source. Since we know how many samples we want to take,
 		we now do a loop <code>num_samples</code> times. Within each of the samples we need to calculate the emitted_radiance which we do by calling 
 		<code>emitted_radiance = (*light)->sample_L(hit_p, &dir_sample, &dist_to_light, &pdf);</code>. We also have to create a new ray to check for 
-		intersections as we mentioned at the high level. This ray will be used to check if there are any intersections in between. We also 
-		make sure to compute the cosine term for the reflectance equation and convert from world coordinates to object coordinates for the sample. If
-		there is no intersection then we can go ahead and get the BSDF and use that value to calculate the radiance for our current sample and add it to the
-		total: <code>L_out_per_light += (f * emitted_radiance * cosval) / pdf;</code>. After we go through all the samples we add to the total
+		intersections as we mentioned previously. This ray will be used to check if there are any intersections. We also 
+		make sure to compute the cosine term for the reflectance equation and convert <code>dir_sample</code> (retrieved from <code>(*light)->sample_L(...)</code>) from world coordinates to object coordinates (this conversion is necessary to ensure the computation of the cosine term in the reflectance equation is correct). If
+		there is no intersection (i.e. there is no other object between the hit point and the light source, so we know the light source casts light on the hit point), then we can go ahead and get the BSDF and use that value to calculate the radiance for our current sample and add it to the
+		total: <code>L_out_per_light += (f * emitted_radiance * cosval) / pdf;</code> (it is worth noting that now, the <code>pdf</code> is being used as set by <code>(*light)->sample_L(...)</code>. After we go through all the samples we add to the total
 		radiance for each light source the average of the current light source: <code>L_out += (L_out_per_light / num_samples);</code>. 
 	</p>
 
