@@ -1,7 +1,111 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 4 here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Courier New', sans-serif;
+  }
+</style>
+<title>CS 184 Final Project Proposal</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body style="background-color:#FAF9F6;">
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging</h1>
+<h1 align="middle">Rendering Iridescence</h1>
+<h2 align="middle">Mantej Panesar, Sean Sananikone, Trevor Suh, Yun Shue</h2>
+
+<br><br>
+
+<div>
+
+<h2 align="left">Summary</h2>
+
+<p>
+  In this project we aim to render iridescent materials. To do so we will build onto the existing ray/path tracer to handle different wavelengths and will implement interference colors as a spectral representation of light giving us the iridescent renders.
+</p>
+
+<br>
+
+<h2 align="left">Problem Description</h2>
+
+<p>
+  Iridescence is a surface property in which color seems to change as the angle of observation changes. Many naturally occurring objects exhibit iridescence, such as soap bubbles, oil films, dragonfly wings, nacre, and more. Our current implementation of Pathtracer cannot render iridescent materials, which means that we are missing out on the multitude of natural objects that exhibit iridescence. We want to address this problem by extending Pathtracer to include wavelength dependent reflectance functions. The idea is to generate different color iridescent images based on different wavelengths (<a href="https://www-users.cse.umn.edu/~gmeyer/papers/gondek-meyer-siggraph-1994.pdf">Wavelength Dependent Reflectance Functions Research Paper</a>).
+</p>
+
+<br>
+
+<h2 align="left">Goals and Deliverables</h2>
+
+<p>
+  Our overall goal is to render a variety of iridescent materials/objects such as soap bubbles, gemstones, insect wings, beetle carapaces, fish scales, etc.
+</p>
+<p>
+  Here are reference images that showcase the iridescent materials that we should be able to render after completing our project:
+  <div align="middle">
+    <img src="https://www.insidescience.org/sites/default/files/2020-06/bug_top.jpg" width="50%" height="50%">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e6/Soap_Bubble_-_foliage_background_-_iridescent_colours_-_Traquair_040801.jpg" width="50%" height="50%">
+    <img src="https://cdn.cnn.com/cnnnext/dam/assets/210603015318-01-pure-structural-color-exhibit-kew-gardens-full-169.jpg " width="50%" height="50%">
+    <img src="https://2.bp.blogspot.com/-UFw8Mds82uc/WqAFvhbzFXI/AAAAAAAAPHM/9C7cIHojb9wDYclTZdFdF9JOIwBN8TtjQCLcBGAs/s1600/labradorite%2B%25281%2529.jpg" width="50%" height="50%">
+  </div>
+</p>
+
+<p>
+  We want to make our renders as close to real life as possible which means understanding the underlying physics of iridescence. For example, iridescence can arise from thin-film interference (soap bubbles) as well as diffraction (peacock spider scales). In our path tracer, we want to simulate iridescence as a result of both phenomena. Because iridescence in the latter case is a result of microstructures of the material, we may need to approximate the surface as a thin-film. In either case, we will evaluate the success of our renderer by comparing our rendered images to several real reference images. With this analysis, we hope to answer how our pathtracer successfully renders iridescence and how we can improve it. At the minimum, we want to be able to render realistic thin-film interference materials. This includes handling variations in film thickness. If we accomplish this, we hope to also successfully render materials with iridescence due to diffraction/complex microstructures.
+</p>
+
+<br>
+
+<h2 align="left">Schedule</h2>
+<p>
+  <ul>
+    <li>Week 1</li>
+    <ul>
+      <li>Outline high-level code changes and new infrastructure needed for project in a design doc</li>
+      <li>Alter Assignment 3 ray optics model to include phase information</li>
+    </ul>
+    <li>Week 2</li>
+    <ul>
+      <li>Implement wavelength-based BRDF</li>
+      <li>Render thin-film interference images</li>
+      <li>Work and prepare deliverables for milestone report (gather images, create slides, and make video)</li>
+    </ul>
+    <li>Week 3</li>
+    <ul>
+      <li>Implement reflectance model for diffraction-induced iridescence (<a href="https://rgl.s3.eu-central-1.amazonaws.com/media/papers/Werner2017Scratch_3.pdf">Reference Paper</a>)</li>
+    </ul>
+    <li>Week 4</li>
+    <ul>
+      <li>Finishing up any remaining tasks (in case they take longer than a week)</li>
+      <li>Finishing touches / cleaning up code / fixing any lingering bugs</li>
+      <li>Work and prepare deliverables for final report (gather images, run performance tests, create slides, and make video)</li>
+    </ul>
+  </ul>
+</p>
+
+<h2 align="left">Resources</h2>
+<p>
+  <ul>
+    <li> <a href="https://www-users.cse.umn.edu/~gmeyer/papers/gondek-meyer-siggraph-1994.pdf">Wavelength Dependent Reflectance Functions</a>
+    <li> <a href="http://www.dgp.toronto.edu/~nmorris/CSC2530/Project/morris.pdf">Capturing the Reflectance Model of Soap Bubbles</a>
+    <li> <a href="https://cs184.eecs.berkeley.edu/sp22/lecture/18-107/color-science">CS 184 Color Science Lecture</a>
+    <li> <a href="https://rgl.s3.eu-central-1.amazonaws.com/media/papers/Werner2017Scratch_3.pdf">Wave-optical rendering of diffractive surface structure</a>
+      <li>We plan to build on our Project 3 code (we will be using the same setup as the course projects; we will render images via the hive when testing performance.</li>
+  </ul>
+</p>
+
+
+</body>
 </html>
