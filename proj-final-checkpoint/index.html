@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 50px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Courier New', sans-serif;
+  }
+</style>
+<title>CS 184 Final Project Checkpoint</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body style="background-color:#FAF9F6;">
+
+<h1 align="middle">Rendering Iridescence Checkpoint</h1>
+<h2 align="middle">Mantej Panesar, Sean Sananikone, Trevor Suh, Yun Shue</h2>
+
+<br>
+
+<div>
+
+<h2 align="left">Accomplishments So Far</h2>
+
+<p>
+  One thing that we have accomplished is updating `raytrace_pixel` to generate RGB values for each sample ray. 
+  To do so we created a helper function to sample RGB values based on three normal distributions for each wavelength plot. 
+  We then passed the sampled wavelength to `generate_ray.` Finally we updated the ray constructor to accept a Vector3D for the sampled RGB wavelength.
+</p>
+
+<p>
+  We also created a new BSDF for thin-film modeled after the microfacet BSDF. To do this, we updated the calculation of the 
+  Fresnel term to use phase, s-polarization/p-polarization, and wavelength dependent transmittance/reflectance. 
+  We also had to refactor code to parameterize this BSDF with a thickness and thin-film material index of refraction. 
+  We changed dae files accordingly to include these parameters and modified the Collada parser to read in the new values.
+</p>
+
+<p>
+  Once implemented, we tried to render some files and debugged issues we ran into. This included fixing how transmittance was being 
+  calculated for the Fresnel term and other issues with code refactoring.
+</p>
+
+<h2 align="left">Preliminary Results</h2>
+
+<p>
+  Our initial attempt at rendering CBbunny by implementing a thin-film model and changing the calculation for the Fresnel term (Left Image).
+  Our rendering of CBbunny after fixing issues with our initial Fresnel term calculation attempt (we had not been considering the contributions for 
+  both s-polarized and p-polarized light). We also fixed parts of our code where we had not been correctly passing along our wavelength parameter to 
+  subsequent functions (Middle Image). The current implementation removes a lot of the noise (Right Image). More 
+  renderings of CBbunny, CBdragon, and CBspheres with our most up to date code can be viewed on our slides.
+</p>
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/Screen Shot 2022-04-27 at 10.12.55 PM.png" width="300px">
+        <figcaption align="middle">CBbunny_microfacet initial attempt</figcaption>
+      </td>
+      <td>
+        <img src="images/Screen Shot 2022-04-27 at 10.13.29 PM.png" width="300px">
+        <figcaption align="middle">CBbunny_microfacet</figcaption>
+      </td>
+      <td>
+        <img src="images/CBbunny_450_1.3.png" width="300px">
+        <figcaption align="middle">CBbunny_microfacet current implementation</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<h2 align="left">Reflect on the Progress</h2>
+
+<p>
+  By the halfway point of the project, we had hoped to have implemented the necessary functions to render iridescence due to thin-film interference. 
+  We would have then moved on to handling diffraction, modeling for example, the scenario of iridescence due to 
+  scratches on the surface of an object. While we have implemented the necessary code, such as refactoring code to 
+  use a spectral representation of light and extending our microfacet BSDF to approximate thin-film interference 
+  effects, we’ve run into bugs in our implementation that we are still working on. We are therefore going to focus on 
+  iridescence due to thin-film interference only for the remainder of the project.
+</p>
+
+<h2 align="left">Updates to Work Plan</h2>
+
+<p>
+  Our revised goal is to render a variety of iridescent objects where the iridescence is solely a result of thin-film interference. 
+  Once we are able to correctly render iridescence for the scenarios above (constant film thickness, area lights), we will handle 
+  variations in film thickness and environment-mapped lighting.
+</p>
+
+<h2 align="left">Links</h2>
+<p>
+  <ul>
+    <li> 
+      <a href="https://docs.google.com/presentation/d/1RgvJsyy4fA5FmN_3YEJDzBdqzc8rP3BiqYrSKHeLN2o/edit?usp=sharing">CS184 Final Project Milestone Slides</a>
+   </li>
+   <li> 
+      <a href="https://docs.google.com/presentation/d/1RgvJsyy4fA5FmN_3YEJDzBdqzc8rP3BiqYrSKHeLN2o/edit?usp=sharing">Video</a>
+   </li>
+  </ul>
+</p>
+
+
+</body>
+</html>
